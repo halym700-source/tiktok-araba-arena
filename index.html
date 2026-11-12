@@ -78,7 +78,7 @@ function makeCar(name,color,index){
  root.position.set(-105-row*10,0,(lane-1)*7.5);
  return{name,root,wheels,glow,color,progress:0,speed:.32+Math.random()*.12,boost:0,lane};
 }
-const cars=[];let phase="idle",voiceOn=true,lastJoiner=null,focusCar=null,focusUntil=0,previousRanks=[],nextId=0,wideView=false,countdownEnd=0,raceEnd=0,pausedRemaining=0;
+const cars=[];let phase="idle",voiceOn=true,lastJoiner=null,focusCar=null,focusUntil=0,previousRanks=[],nextId=0,wideView=false,countdownEnd=0,raceEnd=0,pausedRemaining=0,pausedFrom="idle";
 function addCar(name){const c=makeCar(name,colors[nextId%colors.length],nextId);nextId++;cars.push(c);lastJoiner=c;$('count').textContent=cars.length;$('leader').textContent=leader()?.name||'Henüz yok';return c}
 function leader(){return cars.length?[...cars].sort((a,b)=>b.root.position.x-a.root.position.x)[0]:null}
 function say(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';speechSynthesis.speak(u)}
@@ -97,7 +97,7 @@ function frame(){requestAnimationFrame(frame);const now=performance.now();
   previousRanks=sorted;$('leader').textContent=sorted[0]?.name||'—';
  }
  if(phase==="countdown")$('timer').textContent="00:"+String(Math.max(0,Math.ceil((countdownEnd-now)/1000))).padStart(2,"0");
- else if(phase==="racing"){$('timer').textContent="01:"+String(Math.max(0,Math.ceil((raceEnd-now)/1000))-1).padStart(2,"0");$('timer').textContent="00:"+String(Math.max(0,Math.ceil((raceEnd-now)/1000))).padStart(2,"0");}
+ else if(phase==="racing")$('timer').textContent="00:"+String(Math.max(0,Math.ceil((raceEnd-now)/1000))).padStart(2,"0");
  else if(phase==="idle"||phase==="finished")$('timer').textContent=phase==="finished"?"00:00":"00:30";
  const lead=leader();if(lead)$('leader').textContent=lead.name;
  if(focusCar&&now>focusUntil){focusCar=lead;focusUntil=Infinity;wideView=false;if(lead)$('camlabel').textContent='KAMERA: LİDER • '+lead.name.toUpperCase();}
@@ -110,7 +110,7 @@ function frame(){requestAnimationFrame(frame);const now=performance.now();
 }
 frame();
 $('start').onclick=()=>{const now=performance.now();focusCar=null;focusUntil=0;wideView=false;cars.forEach((c,i)=>{c.root.position.x=-105-Math.floor(i/3)*10;c.progress=0;c.boost=0});previousRanks=[...cars].sort((a,b)=>b.root.position.x-a.root.position.x);phase="countdown";countdownEnd=now+30000;$('status').textContent="30 sn sonra";$('timer').textContent="00:30";$('camlabel').textContent="KAMERA: LİDERİ TAKİP EDİYOR";note("30 saniyelik başlama geri sayımı başladı. Ardından yarış 60 saniye sürecek.");say("Yarışa 30 saniye kaldı.")};
-$('pause').onclick=()=>{const now=performance.now();if(phase==="countdown"){pausedRemaining=Math.max(0,countdownEnd-now);phase="paused";$('status').textContent="Duraklatıldı";note("Geri sayım duraklatıldı. Devam etmek için Yarışı başlat düğmesine bas.");}else if(phase==="racing"){pausedRemaining=Math.max(0,raceEnd-now);phase="paused";$('status').textContent="Duraklatıldı";note("Yarış duraklatıldı.");}else if(phase==="paused"){phase="racing";raceEnd=now+pausedRemaining;$('status').textContent="Yarışıyor";}};
+$('pause').onclick=()=>{const now=performance.now();if(phase==="countdown"){pausedFrom="countdown";pausedRemaining=Math.max(0,countdownEnd-now);phase="paused";$('status').textContent="Duraklatıldı";note("Geri sayım duraklatıldı. Devam etmek için Yarışı başlat düğmesine bas.");}else if(phase==="racing"){pausedFrom="racing";pausedRemaining=Math.max(0,raceEnd-now);phase="paused";$('status').textContent="Duraklatıldı";note("Yarış duraklatıldı.");}else if(phase==="paused"){phase="racing";raceEnd=now+pausedRemaining;$('status').textContent="Yarışıyor";}};
 $('sound').onclick=()=>{voiceOn=!voiceOn;$('sound').textContent='🔊 Sesli anons: '+(voiceOn?'Açık':'Kapalı');if(voiceOn)say('Sesli anons açık')};
 $('join').onclick=()=>{const name=$('nickname').value.trim().replace(/^@/,'');if(!name){note('Önce yarışçı adını yaz.');return}const c=addCar(name);focus(c,'YENİ YARIŞMACI');note(name+' yarışa katıldı. Kamera 3 saniye onun aracını gösteriyor.');$('nickname').value=''};
 $('gift').onclick=()=>{const c=lastJoiner||leader();if(!c){note('Önce yarışçı ekle.');return}c.boost=180;focus(c,'HEDİYE GÖNDERDİ');note('Demo hediye: '+c.name+' hızlandı! Gerçek hediye gönderen eşleştirmesi TikTok bağlantısı eklenince çalışacak.')};
