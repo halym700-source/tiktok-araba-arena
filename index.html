@@ -1,89 +1,99 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>TikTok Araba Arena</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TikTok Araba Arena 3D</title>
 <style>
-:root{color-scheme:dark;--bg:#090d18;--panel:#141b2c;--line:#293650;--cyan:#36e2ff;--pink:#ff4d9d;--gold:#ffd45c}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#25365c 0,#090d18 55%);font-family:system-ui,-apple-system,sans-serif;color:#f5f7ff;padding:14px}
-main{max-width:920px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-h1{font-size:clamp(22px,5vw,34px);margin:0;letter-spacing:.5px}.tag{font-size:12px;color:#a8b8d7;border:1px solid var(--line);padding:7px 10px;border-radius:30px}
-.arena{background:#101827;border:1px solid #33425e;border-radius:18px;overflow:hidden;box-shadow:0 16px 45px #0008}
-canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#182334}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
-.stat small{display:block;color:#9baac5;font-size:11px}.stat strong{font-size:20px}
-.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-button,input{font:inherit}button{border:0;border-radius:12px;padding:13px 10px;font-weight:750;background:#263653;color:white;cursor:pointer}button.primary{background:linear-gradient(100deg,#08b9db,#2878ff)}button.pink{background:linear-gradient(100deg,#f43d93,#8b4dff)}button.gold{background:linear-gradient(100deg,#f2b93f,#ff7a39);color:#211400}
-button:active{transform:scale(.98)}.join{display:flex;gap:8px;margin-top:10px}.join input{min-width:0;flex:1;background:#0c1321;border:1px solid var(--line);border-radius:12px;color:white;padding:12px}
-.panel{margin-top:10px}.panel h2{font-size:15px;margin:0 0 8px}.feed{min-height:52px;color:#b9c7df;font-size:13px;line-height:1.6}.hint{color:#8fa0bd;font-size:12px;margin:12px 2px}
+*{box-sizing:border-box}body{margin:0;padding:12px;background:#080d19;color:#f4f7ff;font-family:system-ui,-apple-system,sans-serif}
+main{max-width:1000px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}h1{font-size:clamp(21px,5vw,32px);margin:0}.pill{font-size:11px;color:#9eb2d4;border:1px solid #33425e;padding:7px 10px;border-radius:30px}
+#stage{position:relative;border:1px solid #34425d;border-radius:16px;overflow:hidden;background:#101b2d;box-shadow:0 14px 45px #0008}#game{display:block;width:100%;height:clamp(260px,58vw,560px);touch-action:pan-y}
+#camlabel{position:absolute;left:10px;top:10px;background:#07101dcc;border:1px solid #50617e;border-radius:10px;padding:7px 10px;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:9px 0}.stat,.panel{background:#141d30;border:1px solid #2d3b57;border-radius:12px;padding:10px}.stat small{display:block;color:#9aabc8;font-size:10px}.stat strong{font-size:18px}
+.controls{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}button,input{font:inherit}button{border:0;border-radius:11px;padding:12px 8px;color:white;background:#293957;font-weight:750}button.primary{background:linear-gradient(100deg,#08b9dc,#286cff)}button.gift{background:linear-gradient(100deg,#ed3e96,#9047ff)}button:active{transform:scale(.98)}
+.join{display:flex;gap:7px;margin-top:8px}.join input{min-width:0;flex:1;background:#0c1424;color:white;border:1px solid #33425e;border-radius:11px;padding:11px}
+.panel{margin-top:9px}.panel h2{font-size:14px;margin:0 0 5px}.feed{font-size:12px;color:#c1cce0;min-height:34px;line-height:1.5}.hint{font-size:11px;color:#8fa1c0;line-height:1.5}
 @media(min-width:650px){.controls{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
-<body>
-<main>
-<div class="top"><h1>🏁 TIKTOK ARABA ARENA</h1><span class="tag">ÜCRETSİZ DEMO • v0.1</span></div>
-<div class="arena"><canvas id="game" width="960" height="540" aria-label="Araba yarışı arenası"></canvas></div>
+<body><main>
+<header><h1>🏁 TIKTOK ARABA ARENA 3D</h1><span class="pill">3 ARAÇ • 3D KAMERA</span></header>
+<div id="stage"><canvas id="game"></canvas><div id="camlabel">KAMERA: TÜM YARIŞ</div></div>
 <div class="stats">
- <div class="stat"><small>YARIŞ DURUMU</small><strong id="status">Hazır</strong></div>
- <div class="stat"><small>YARIŞAN ARAÇ</small><strong id="count">3</strong></div>
- <div class="stat"><small>TUR</small><strong id="lap">0</strong></div>
+<div class="stat"><small>YARIŞ</small><strong id="status">Hazır</strong></div>
+<div class="stat"><small>LİDER</small><strong id="leader">Mavi</strong></div>
+<div class="stat"><small>TUR</small><strong id="lap">0</strong></div>
 </div>
 <div class="controls">
- <button class="primary" id="start">▶ Yarışı başlat</button>
- <button id="add">🚗 Araç ekle</button>
- <button class="gold" id="turbo">⚡ Turbo ver</button>
- <button class="pink" id="voice">🔊 Sesli anons: Açık</button>
+<button class="primary" id="start">▶ Yarışı başlat</button>
+<button id="pause">Ⅱ Duraklat</button>
+<button class="gift" id="gift">🎁 Hediye dene (kamera)</button>
+<button id="sound">🔊 Sesli anons: Açık</button>
 </div>
-<div class="join">
- <input id="nickname" maxlength="18" placeholder="Oyuncu adı yaz (ör. @ali)">
- <button class="primary" id="join">Yarışa katıl</button>
-</div>
-<div class="panel"><h2>📣 Oyun olayları</h2><div class="feed" id="feed">Demo hazır. Yarışı başlatabilir, araç ekleyebilir ve turbo deneyebilirsin.</div></div>
-<p class="hint">Bu sürüm tarayıcı demosudur. TikTok LIVE yorumları ve hediyeleri henüz bağlı değildir; gerçek yayın bağlantısı için sonraki aşamada sunucu kurulacaktır.</p>
+<div class="join"><input id="nickname" maxlength="18" placeholder="Yarışçı adı (ör. ali)"><button class="primary" id="join">Yarışa katıl</button></div>
+<div class="panel"><h2>📣 Yarış olayları</h2><div class="feed" id="feed">3D arena hazır. Başlat'a bas; yarış ilk olarak tüm araçları gösterecek.</div></div>
+<p class="hint">Bu sürüm 3D tarayıcı demosudur. Katılım ve hediye düğmeleri kamera geçişini test eder. Gerçek TikTok LIVE yorum/hediye bağlantısı henüz eklenmedi. 3D görüntü için internet bağlantısı gerekir.</p>
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-const $=id=>document.getElementById(id);
-let cars=[],running=false,voiceOn=true,last=0,lap=0,raf=0;
-const palette=['#37dcff','#ff559b','#ffd35a','#9b83ff','#63e58c','#ff8b52'];
-function makeCar(name){const lane=cars.length;return{name,x:120-lane*45,y:180+lane*90,angle:0,speed:1.25+Math.random()*0.25,color:palette[lane%palette.length],turbo:0,progress:0}}
-cars=[makeCar('Mavi'),makeCar('Pembe'),makeCar('Altın')];
-function say(t){if(!voiceOn||!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';u.rate=1.05;speechSynthesis.speak(u)}
+(()=>{
+const $=id=>document.getElementById(id), canvas=$('game');
+if(!window.THREE){$('feed').textContent='3D motor yüklenemedi. İnternet bağlantısını kontrol edip sayfayı yenile.';return;}
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x101a2b);scene.fog=new THREE.Fog(0x101a2b,45,125);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const camera=new THREE.PerspectiveCamera(48,1,.1,250);
+scene.add(new THREE.HemisphereLight(0xb9d7ff,0x25301f,1.35));
+const sun=new THREE.DirectionalLight(0xffffff,1.6);sun.position.set(-15,25,12);sun.castShadow=true;scene.add(sun);
+const mat=(color,rough=.55,metal=0)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(240,100),mat(0x243044));ground.rotation.x=-Math.PI/2;ground.position.y=-.16;ground.receiveShadow=true;scene.add(ground);
+const track=new THREE.Mesh(new THREE.PlaneGeometry(150,22),mat(0x343b49,.9));track.rotation.x=-Math.PI/2;track.position.y=-.12;track.receiveShadow=true;scene.add(track);
+for(let z=-9;z<=9;z+=18){const line=new THREE.Mesh(new THREE.BoxGeometry(150,.025,.12),mat(0xe4eaf5));line.position.set(0,-.095,z);scene.add(line)}
+for(let x=-68;x<=68;x+=8){const dash=new THREE.Mesh(new THREE.BoxGeometry(.12,.025,10),mat(0xc2ccdc));dash.position.set(x,-.09,0);scene.add(dash)}
+const startLine=new THREE.Mesh(new THREE.BoxGeometry(.7,.04,21),mat(0xffffff));startLine.position.set(-62,-.07,0);scene.add(startLine);
+function makeCar(name,color,z){
+ const root=new THREE.Group();scene.add(root);
+ const body=new THREE.Mesh(new THREE.BoxGeometry(4.4,.8,1.9),mat(color,.28,.35));body.position.y=.75;body.castShadow=true;root.add(body);
+ const hood=new THREE.Mesh(new THREE.BoxGeometry(1.15,.28,1.78),mat(color,.25,.3));hood.position.set(1.35,1.1,0);root.add(hood);
+ const cabin=new THREE.Mesh(new THREE.BoxGeometry(2.05,.85,1.52),mat(0x101a2b,.18,.45));cabin.position.set(-.25,1.35,0);cabin.castShadow=true;root.add(cabin);
+ const roof=new THREE.Mesh(new THREE.BoxGeometry(1.35,.12,1.55),mat(color,.25,.25));roof.position.set(-.3,1.82,0);root.add(roof);
+ const wheelMat=mat(0x090b10,.95),rim=mat(0xaab6c8,.25,.8);
+ for(const x of [-1.35,1.35])for(const zz of [-1,1]){
+  const w=new THREE.Mesh(new THREE.CylinderGeometry(.43,.43,.28,20),wheelMat);w.rotation.x=Math.PI/2;w.position.set(x,.48,zz*.88);w.castShadow=true;root.add(w);
+  const hub=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.3,16),rim);hub.rotation.x=Math.PI/2;hub.position.copy(w.position);root.add(hub);
+ }
+ const glow=new THREE.PointLight(color,0,8);glow.position.set(-2,.8,0);root.add(glow);
+ root.position.set(-55,.0,z);return{name,root,speed:0.23+Math.random()*.045,progress:0,color,glow,boost:0};
+}
+const cars=[makeCar('Mavi',0x24cfff,-5.8),makeCar('Pembe',0xff438d,0),makeCar('Altın',0xffc84a,5.8)];
+let running=false,voiceOn=true,lap=0,focusUntil=0,focusCar=null,previousOrder=[...cars],lastLeader=null,joinIndex=0;
+function say(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';speechSynthesis.speak(u)}
 function note(t){$('feed').textContent=t}
-function drawTrack(){
- ctx.fillStyle='#172b2b';ctx.fillRect(0,0,960,540);
- ctx.fillStyle='#303b4b';ctx.fillRect(55,95,850,350);
- ctx.fillStyle='#222d3d';ctx.fillRect(55,105,850,330);
- ctx.strokeStyle='#e7edf7';ctx.lineWidth=4;ctx.setLineDash([24,18]);
- [225,315].forEach(y=>{ctx.beginPath();ctx.moveTo(70,y);ctx.lineTo(890,y);ctx.stroke()});ctx.setLineDash([]);
- ctx.fillStyle='#dce7f5';ctx.font='bold 18px system-ui';ctx.textAlign='center';ctx.fillText('BAŞLANGIÇ',115,75);
- ctx.fillStyle='#36e2ff';ctx.fillRect(105,105,8,330);
- ctx.fillStyle='#ff4d9d';ctx.fillRect(850,105,8,330);
- ctx.fillStyle='#9eabc2';ctx.font='bold 14px system-ui';ctx.fillText('FİNİŞ',855,75);
+function focus(c,seconds,label){focusCar=c;focusUntil=performance.now()+seconds*1000;$('camlabel').textContent='KAMERA: '+label+' — '+c.name.toUpperCase();say(label+' '+c.name)}
+function leader(){return [...cars].sort((a,b)=>b.progress-a.progress)[0]}
+function setWide(){focusCar=null;$('camlabel').textContent='KAMERA: TÜM YARIŞ'}
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(canvas);resize();
+function frame(){
+ requestAnimationFrame(frame);const now=performance.now();
+ if(running){
+  cars.forEach(c=>{const v=c.speed*(c.boost>0?2.8:1);c.root.position.x+=v;if(c.boost>0)c.boost--;if(c.root.position.x>65){c.root.position.x=-62;c.progress++;}});
+  lap=Math.max(...cars.map(c=>c.progress));$('lap').textContent=lap;
+  const order=[...cars].sort((a,b)=>b.root.position.x-a.root.position.x);
+  for(const c of order){const old=previousOrder.indexOf(c);const newp=order.indexOf(c);if(old>newp&&old!==-1&&newp===0){focus(c,1.7,'ÖNE GEÇTİ!');note(c.name+' öne geçti! Kamera araca yaklaşıyor.');}}
+  previousOrder=order;
+ }
+ const lead=leader();$('leader').textContent=lead.name;
+ if(focusCar&&now>focusUntil){setWide();focusCar=null;}
+ let target,look;
+ if(focusCar&&now<=focusUntil){target=focusCar.root.position.clone().add(new THREE.Vector3(-9,6,8));look=focusCar.root.position.clone().add(new THREE.Vector3(2,.8,0));}
+ else {target=new THREE.Vector3(-7,25,38);look=new THREE.Vector3(0,0,0);}
+ camera.position.lerp(target,.065);camera.lookAt(look);
+ renderer.render(scene,camera);
 }
-function drawCar(c){
- ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.angle);
- ctx.shadowColor=c.color;ctx.shadowBlur=15;ctx.fillStyle=c.color;
- ctx.beginPath();ctx.roundRect(-19,-10,38,20,7);ctx.fill();ctx.shadowBlur=0;
- ctx.fillStyle='#101827';ctx.fillRect(-7,-7,15,14);ctx.fillStyle='#fff';ctx.fillRect(12,-6,4,4);ctx.fillRect(12,2,4,4);
- if(c.turbo>0){ctx.fillStyle='#ffb43b';ctx.beginPath();ctx.moveTo(-18,-5);ctx.lineTo(-34,0);ctx.lineTo(-18,5);ctx.fill()}
- ctx.restore();
- ctx.fillStyle='#fff';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(c.name,c.x,c.y-18);
-}
-function render(t=0){
- const dt=Math.min((t-last)/16||1,2);last=t;drawTrack();
- if(running){cars.forEach(c=>{c.x+=(c.speed+(c.turbo>0?2.8:0))*dt*1.5;if(c.x>850){c.x=120;c.progress++;}if(c.turbo>0)c.turbo--});lap=Math.max(lap,...cars.map(c=>c.progress));$('lap').textContent=lap}
- cars.forEach(drawCar);$('count').textContent=cars.length;
- raf=requestAnimationFrame(render);
-}
-function addCar(name){note('Bu yarışta araç sayısı sabit: 3. Yeni oyuncu için mevcut araçlardan biri seçilmeli.');}
-$('start').onclick=()=>{running=!running;$('status').textContent=running?'Yarışıyor':'Duraklatıldı';$('start').textContent=running?'Ⅱ Duraklat':'▶ Devam et';if(running)say('Yarış başlıyor! Hazır, başla!');note(running?'Yarış başladı!':'Yarış duraklatıldı.')};
-$('add').onclick=()=>addCar();$('turbo').onclick=()=>{if(!cars.length)return;let c=cars[Math.floor(Math.random()*cars.length)];c.turbo=100;note(c.name+' turbo aldı!');say(c.name+' turbo aldı!')};
-$('voice').onclick=()=>{voiceOn=!voiceOn;$('voice').textContent='🔊 Sesli anons: '+(voiceOn?'Açık':'Kapalı');if(voiceOn)say('Sesli anons açık')};
-$('join').onclick=()=>{let n=$('nickname').value.trim().replace(/^@/,'');if(!n){note('Önce bir oyuncu adı yaz.');return}note('3 araç sınırı dolu. '+n+' sonraki yarışa katılabilir.');$('nickname').value=''};
-$('nickname').addEventListener('keydown',e=>{if(e.key==='Enter')$('join').click()});
-render();
-</script>
-</body>
-</html>
+frame();
+$('start').onclick=()=>{running=true;$('status').textContent='Yarışıyor';note('Yarış başladı! İlk kamera tüm araçları gösteriyor.');setWide();say('Yarış başlıyor!');};
+$('pause').onclick=()=>{running=false;$('status').textContent='Duraklatıldı';note('Yarış duraklatıldı.');};
+$('sound').onclick=()=>{voiceOn=!voiceOn;$('sound').textContent='🔊 Sesli anons: '+(voiceOn?'Açık':'Kapalı');if(voiceOn)say('Sesli anons açık')};
+$('join').onclick=()=>{const name=$('nickname').value.trim().replace(/^@/,'');if(!name){note('Önce yarışçı adını yaz.');return;}const c=cars[joinIndex%3];joinIndex++;c.name=name;c.root.position.x=-55;focus(c,3,'YENİ YARIŞMACI');note(name+' yarışa katıldı. Kamera 3 saniye onun arabasında!');$('nickname').value='';};
+$('gift').onclick=()=>{const c=leader();c.boost=100;focus(c,3,'HEDİYE GÖNDERDİ');note('Hediye gönderenin aracı 3 saniye ekranda! (Demo testi)');};
+})();
+</script></body></html>
