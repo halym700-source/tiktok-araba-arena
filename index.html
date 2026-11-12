@@ -78,13 +78,13 @@ function makeCar(name,color,index){
  root.position.set(-112-row*10,0,(lane-1)*7.5);
  return{name,root,wheels,glow,color,progress:0,speed:.32+Math.random()*.12,boost:0,lane};
 }
-const cars=[];let running=false,voiceOn=true,lastJoiner=null,focusCar=null,focusUntil=0,previousRanks=[],nextId=0,lastLeader=null;
+const cars=[];let running=false,voiceOn=true,lastJoiner=null,focusCar=null,focusUntil=0,previousRanks=[],nextId=0,lastLeader=null,wideView=true;
 function addCar(name){const c=makeCar(name,colors[nextId%colors.length],nextId);nextId++;cars.push(c);lastJoiner=c;$('count').textContent=cars.length;$('leader').textContent=leader()?.name||'Henüz yok';return c}
 function leader(){return cars.length?[...cars].sort((a,b)=>b.root.position.x-a.root.position.x)[0]:null}
 function say(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';speechSynthesis.speak(u)}
 function note(t){$('feed').textContent=t}
-function setWide(){focusCar=null;focusUntil=0;$('camlabel').textContent='KAMERA: TÜM YARIŞ'}
-function focus(c,label){if(!c)return;focusCar=c;focusUntil=performance.now()+3000;$('camlabel').textContent='KAMERA: '+label+' • '+c.name.toUpperCase();say(label+' '+c.name)}
+function setWide(){focusCar=null;focusUntil=0;wideView=true;$('camlabel').textContent='KAMERA: TÜM YARIŞ'}
+function focus(c,label){if(!c)return;wideView=false;focusCar=c;focusUntil=performance.now()+3000;$('camlabel').textContent='KAMERA: '+label+' • '+c.name.toUpperCase();say(label+' '+c.name)}
 function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
 if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);else window.addEventListener('resize',resize);resize();
 for(const n of ['Mavi','Pembe','Altın'])addCar(n);
@@ -95,7 +95,7 @@ function frame(){requestAnimationFrame(frame);const now=performance.now();
   previousRanks=sorted;$('leader').textContent=sorted[0]?.name||'—';
  }
  const lead=leader();if(lead)$('leader').textContent=lead.name;
- if(focusCar&&now>focusUntil){focusCar=lead;focusUntil=Infinity;if(lead)$('camlabel').textContent='KAMERA: LİDER • '+lead.name.toUpperCase();}
+ if(focusCar&&now>focusUntil){focusCar=lead;focusUntil=Infinity;wideView=false;if(lead)$('camlabel').textContent='KAMERA: LİDER • '+lead.name.toUpperCase();}
  let target,look;
  if(focusCar&&now<=focusUntil){target=focusCar.root.position.clone().add(new THREE.Vector3(-10,6,8));look=focusCar.root.position.clone().add(new THREE.Vector3(1,1,0));}
  else if(lead){target=lead.root.position.clone().add(new THREE.Vector3(-24,18,34));look=lead.root.position.clone().add(new THREE.Vector3(8,0,0));}
