@@ -1,118 +1,78 @@
 <!doctype html>
-<html lang="tr">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>TikTok Araba Arena — 3D Yarış</title>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>At Arenası 3D</title>
 <style>
-*{box-sizing:border-box}body{margin:0;padding:12px;background:#070b13;color:#f5f7ff;font-family:system-ui,-apple-system,sans-serif}main{max-width:1100px;margin:auto}
-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}h1{font-size:clamp(20px,5vw,31px);margin:0}.pill{font-size:11px;color:#a9bddb;border:1px solid #34435d;padding:7px 10px;border-radius:30px}
-#stage{position:relative;overflow:hidden;border:1px solid #34435d;border-radius:16px;background:#111b2b;box-shadow:0 16px 50px #0009}#game{display:block;width:100%;height:clamp(280px,64vw,600px);touch-action:pan-y}
-#camlabel{position:absolute;top:10px;left:10px;background:#080e1bdc;border:1px solid #60718e;border-radius:10px;padding:8px 11px;font-size:11px;font-weight:800;letter-spacing:.4px}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:9px 0}@media(min-width:560px){.stats{grid-template-columns:repeat(4,1fr)}}.stat,.panel{background:#131d2e;border:1px solid #2d3b55;border-radius:12px;padding:10px}.stat small{display:block;color:#9bacc7;font-size:10px}.stat strong{font-size:17px}
-.controls{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}button,input{font:inherit}button{border:0;border-radius:11px;padding:12px 8px;color:white;background:#293957;font-weight:750}button.primary{background:linear-gradient(100deg,#08b9dc,#286cff)}button.gift{background:linear-gradient(100deg,#ed3e96,#9047ff)}button:active{transform:scale(.98)}
-.join{display:flex;gap:7px;margin-top:8px}.join input{min-width:0;flex:1;background:#0c1424;color:white;border:1px solid #33425e;border-radius:11px;padding:11px}
-.panel{margin-top:9px}.panel h2{font-size:14px;margin:0 0 6px}.feed{font-size:12px;color:#c1cce0;min-height:32px;line-height:1.5}.hint{font-size:11px;color:#8fa1c0;line-height:1.55}
-@media(min-width:650px){.controls{grid-template-columns:repeat(4,1fr)}}
-</style></head>
-<body><main>
-<header><h1>🏁 ARABA ARENA 3D</h1><span class="pill">3D SPOR OTOMOBİLLER • DÜZ PİST</span></header>
-<div id="stage"><canvas id="game"></canvas><div id="camlabel">KAMERA: TÜM YARIŞ</div></div>
-<div class="stats"><div class="stat"><small>YARIŞ DURUMU</small><strong id="status">Hazır</strong></div><div class="stat"><small>LİDER</small><strong id="leader">Henüz yok</strong></div><div class="stat"><small>YARIŞÇI</small><strong id="count">0</strong></div><div class="stat"><small>KALAN SÜRE</small><strong id="timer">00:30</strong></div></div>
-<div class="controls"><button class="primary" id="start">▶ Yarışı başlat</button><button id="pause">Ⅱ Duraklat</button><button class="gift" id="gift">🎁 Hediye simüle et</button><button id="sound">🔊 Sesli anons: Açık</button></div>
-<div class="join"><input id="nickname" maxlength="18" placeholder="Yarışçı adı (ör. ali)"><button class="primary" id="join">+ Yarışçı ekle</button></div>
-<div class="panel"><h2>📣 Yarış olayları</h2><div class="feed" id="feed">Yeni 3D arena hazır. Yarışı başlatabilir veya isim girip yarışçı ekleyebilirsin.</div></div>
-<p class="hint">Bu sürüm tarayıcıda çalışan 3D oyun prototipidir. Yarışçı ekleme ve hediye düğmeleri şimdilik test amaçlıdır; gerçek TikTok LIVE yorum/hediye akışı henüz bağlı değildir. Three.js motoru internetten yüklenir.</p>
+*{box-sizing:border-box}html,body{margin:0;background:#080d13;color:#f4f7ff;font-family:system-ui,-apple-system,sans-serif}body{padding:10px}main{max-width:1100px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 8px}h1{font-size:clamp(18px,4vw,28px);margin:0}.tag{font-size:10px;letter-spacing:.1em;color:#b9c9dd;border:1px solid #40516a;border-radius:30px;padding:7px 10px}#stage{position:relative;border:1px solid #3a4b5d;border-radius:15px;overflow:hidden;background:#172a31}#game{display:block;width:100%;height:clamp(300px,68vw,610px);touch-action:pan-y}#hud{position:absolute;inset:10px 10px auto;display:flex;justify-content:space-between;gap:8px;pointer-events:none}#hud span{background:#07101bd9;border:1px solid #ffffff30;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:800}#announce{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font-size:clamp(24px,6vw,48px);font-weight:1000;text-shadow:0 3px 12px #000;text-align:center;pointer-events:none;white-space:nowrap}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:8px 0}.stat{background:#131e2a;border:1px solid #304052;border-radius:10px;padding:9px}.stat small{display:block;color:#9fb1c4;font-size:9px}.stat b{font-size:15px}.below{font-size:11px;color:#91a5ba;margin:7px 2px}.shade{display:none;position:fixed;inset:0;background:#000b;z-index:5;align-items:center;justify-content:center;padding:14px}.shade.open{display:flex}.menu{width:min(680px,100%);max-height:90vh;overflow:auto;background:#101b28;border:1px solid #52677d;border-radius:16px;padding:16px;box-shadow:0 20px 70px #000}.menu h2{margin:0 0 10px}.menu h3{font-size:13px;margin:14px 0 6px;color:#c9d9e8}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.menu button,.menu select,.menu input{width:100%;border:1px solid #43566b;background:#1c2b3c;color:#fff;border-radius:9px;padding:10px;font:inherit;font-size:12px}.menu button.primary{background:#147bba;border:0;font-weight:800}.menu button.danger{background:#8b2f42}.menu label{font-size:11px;color:#b7c6d5;display:block;margin:5px 0}.menu .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.menu .note{font-size:11px;color:#91a5ba;line-height:1.5}.menu .close{float:right;width:auto}.menu select{margin-top:4px}.menu input{margin-top:4px}
+</style></head><body><main>
+<header><h1>🐎 AT ARENASI 3D</h1><span class="tag">OTONOM YARIŞ • 3D</span></header>
+<div id="stage"><canvas id="game"></canvas><div id="hud"><span id="raceState">KAPI AÇILMAYI BEKLİYOR</span><span id="timer">00:15</span></div><div id="announce">AT ARENASI</div></div>
+<div class="stats"><div class="stat"><small>LİDER</small><b id="leader">—</b></div><div class="stat"><small>PISTTEKİ AT</small><b id="runners">0</b></div><div class="stat"><small>SON KAZANAN</small><b id="winner">—</b></div></div>
+<p class="below">Yarış otomatik ilerler. Kamera lideri, atakları ve bitişi kendisi takip eder. Ayarlar için ekrana dokunup ESC menüsünü açın.</p>
 </main>
+<div class="shade" id="shade"><section class="menu"><button class="close" id="close">Kapat ✕</button><h2>⚙️ Yarış Kontrol Merkezi</h2><p class="note">Tüm ayarlar burada. Bu panel yayında görünmesin istiyorsanız ayarları yapıp kapatın. Gerçek TikTok olay bağlantısı ayrıca sunucu köprüsü gerektirir; aşağıdaki olaylar test amaçlıdır.</p>
+<h3>Yarış ayarları</h3><div class="row"><label>Pist<select id="track"><option value="0">1 • Kraliyet Hipodromu</option><option value="1">2 • Sahil Yarışı</option><option value="2">3 • Çöl Grand Prix</option></select></label><label>Mekân<select id="scene"><option value="0">Gündüz</option><option value="1">Gün batımı</option><option value="2">Gece</option><option value="3">Karlı</option><option value="4">Çöl</option><option value="5">Sahil</option></select></label></div>
+<div class="row"><label>Kapı geri sayımı (sn)<input id="countdown" type="number" min="3" max="60" value="15"></label><label>Yarış süresi (sn)<input id="duration" type="number" min="20" max="300" value="90"></label></div>
+<div class="row"><button class="primary" id="start">Kapıları kur / Yarışı başlat</button><button id="reset">Yarışı sıfırla</button></div>
+<h3>İzleyici olaylarını test et</h3><div class="grid"><button id="comment">💬 Yorum yazdı (katıl)</button><button id="like">❤️ Beğeni (tezahürat)</button><button id="follow">➕ Takip (atak)</button><button id="join">👤 Yeni izleyici katıldı</button></div><label>İzleyici adı<input id="viewer" placeholder="Örn. ali"></label>
+<h3>Hediye eşleştirmeleri</h3><p class="note">Her hediye etkisini buradan seçin. Hediye ismi eşleştirilmemişse jeton miktarı kadar saniye atak verir; her 100 jetonda bir seviye kazandırır.</p><div id="giftMappings"></div>
+<h3>Hediye / etki test alanı</h3><div class="row"><label>Hediye adı<input id="giftName" placeholder="Örn. Gül"></label><label>Jeton<input id="coins" type="number" min="1" value="1"></label></div><button class="primary" id="sendGift">🎁 Hediyeyi uygula (test)</button>
+<p class="note">Atlar yarış öncesi gelen etkileri kapılar açılana kadar biriktirir. Eşekle başlarlar; 12 seviyede hızları artar. Efektler: Atak, Alev Yele, Pegasus, Engel Atla, Kestirme, At Yükselt, Şans Nalı, Nazar Boncuğu, Koruma, Yıldırım, Çamur, Havai Fişek, Geri Çağır.</p>
+</section></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-(()=> {
-const $=id=>document.getElementById(id),canvas=$('game');
-if(!window.THREE){$('feed').textContent='3D motor yüklenemedi. İnternet bağlantısını kontrol edip sayfayı yenile.';return;}
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bb9d0);scene.fog=new THREE.Fog(0x9bb9d0,500,2600);
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.7));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-const camera=new THREE.PerspectiveCamera(52,1,.1,5000);
-scene.add(new THREE.HemisphereLight(0xd9edff,0x28313b,1.55));
-const sun=new THREE.DirectionalLight(0xffffff,2.1);sun.position.set(-45,70,35);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
-const mat=(c,r=.45,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
-const asphalt=mat(0x252b34,.94),white=mat(0xf2f3f5,.55),rubber=mat(0x080a0e,.98),chrome=mat(0xaebdca,.22,.88),glass= new THREE.MeshPhysicalMaterial({color:0x152b3c,roughness:.13,metalness:.35,transparent:true,opacity:.9});
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(12000,220),mat(0x47604b));ground.rotation.x=-Math.PI/2;ground.position.y=-.22;ground.receiveShadow=true;scene.add(ground);
-const track=new THREE.Mesh(new THREE.PlaneGeometry(12000,27),asphalt);track.rotation.x=-Math.PI/2;track.position.y=-.16;track.receiveShadow=true;scene.add(track);
-function box(w,h,d,material,x,y,z,parent){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
-for(let z of [-13.4,13.4])box(12000,.18,.28,white,0,-.06,z,scene);
-// Long dashed lane lines: one lightweight geometry for each lane
-for(let z of [-4.5,4.5]){const pts=[];for(let x=-5990;x<=5990;x+=18){pts.push(new THREE.Vector3(x,-.055,z),new THREE.Vector3(x+8,-.055,z))}const g=new THREE.BufferGeometry().setFromPoints(pts);scene.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xc9d0d7})))}
-// Endless-looking safety barriers along the straight
-for(let z of [-17,17])box(12000,1,.55,mat(0xd8e0e7),0,.35,z,scene);
-// start / finish checker pattern
-for(let i=0;i<12;i++)for(let j=0;j<4;j++){const c=(i+j)%2?0xffffff:0x11151b;box(1,.045,1.5,mat(c),-105+i*1.5,-.04,-8.25+j*1.5,scene)}
-const colors=[0x13bce8,0xf13d79,0xffbd36,0x8d68ff,0x5bd17a,0xf16c32,0xe9edf5,0x20c5a3,0xff5cce,0x8ea3b8];
-function makeCar(name,color,index){
- const root=new THREE.Group();scene.add(root);const paint=mat(color,.22,.62),dark=mat(0x111923,.38,.25),tire=mat(0x090b0f,.98),lamp=new THREE.MeshStandardMaterial({color:0xfff4d0,emissive:0xffd98a,emissiveIntensity:1.8});
- // sculpted lower chassis and body
- const chassis=box(5.5,.68,2.35,paint,0,.78,0,root);chassis.scale.set(1,.92,1);
- box(1.25,.28,2.2,paint,2.05,1.03,0,root);
- box(1.0,.22,2.18,paint,-2.05,1.0,0,root);
- // cabin with slanted windscreen and rear glass
- const cabin=new THREE.Mesh(new THREE.BoxGeometry(2.55,.86,1.78),glass);cabin.position.set(-.05,1.42,0);cabin.castShadow=true;root.add(cabin);
- const roof=box(1.35,.16,1.82,paint,-.12,1.91,0,root);
- // hood sculpt lines, bumpers, grille
- for(let z of [-.72,.72]){const stripe=box(1.45,.025,.035,mat(0x151c25,.3,.6),1.45,1.18,z,root)}
- box(.16,.35,1.95,dark,2.73,.68,0,root);box(.15,.34,1.95,dark,-2.73,.68,0,root);
- box(.12,.32,.95,mat(0x080d13),2.82,.78,0,root);
- for(let z of [-.82,.82]){box(.16,.22,.38,lamp,2.78,.92,z,root);box(.12,.16,.4,mat(0xff243e,.25,.1),-2.78,.9,z,root)}
- // side skirts and mirrors
- for(let z of [-1.2,1.2]){box(3.5,.18,.12,dark,0,.48,z,root);box(.34,.15,.3,paint,.75,1.32,z,root)}
- // wheels with metallic hubs, brakes, five spokes
- const wheels=[];
- for(let x of [-1.75,1.75])for(let z of [-1.18,1.18]){
-  const w=new THREE.Mesh(new THREE.CylinderGeometry(.51,.51,.34,28),tire);w.rotation.x=Math.PI/2;w.position.set(x,.53,z);w.castShadow=true;root.add(w);wheels.push(w);
-  const hub=new THREE.Mesh(new THREE.CylinderGeometry(.29,.29,.36,24),chrome);hub.rotation.x=Math.PI/2;hub.position.copy(w.position);root.add(hub);
-  for(let k=0;k<5;k++){const a=k*Math.PI*2/5;const spoke=box(.055,.43,.04,mat(0x4c5968,.25,.9),x,.53+Math.sin(a)*.18,z+Math.cos(a)*.18,root);spoke.rotation.x=a}
- }
- // rear wing and exhaust
- box(.16,.6,1.6,dark,-2.35,1.48,0,root);box(.3,.12,2.3,paint,-2.4,1.78,0,root);
- for(let z of [-.48,.48]){const ex=new THREE.Mesh(new THREE.CylinderGeometry(.12,.15,.25,12),chrome);ex.rotation.z=Math.PI/2;ex.position.set(-2.83,.48,z);root.add(ex)}
- const tag=box(1.4,.28,.04,mat(0x111722),0,2.12,0,root);
- const glow=new THREE.PointLight(color,0,12);glow.position.set(-2,.8,0);root.add(glow);
- const lane=index%3,row=Math.floor(index/3);
- root.position.set(-105-row*10,0,(lane-1)*7.5);
- return{name,root,wheels,glow,color,progress:0,speed:.32+Math.random()*.12,boost:0,lane};
-}
-const cars=[];let phase="idle",voiceOn=true,lastJoiner=null,focusCar=null,focusUntil=0,previousRanks=[],nextId=0,wideView=false,countdownEnd=0,raceEnd=0,pausedRemaining=0,pausedFrom="idle";
-function addCar(name){const c=makeCar(name,colors[nextId%colors.length],nextId);nextId++;cars.push(c);lastJoiner=c;$('count').textContent=cars.length;$('leader').textContent=leader()?.name||'Henüz yok';return c}
-function leader(){return cars.length?[...cars].sort((a,b)=>b.root.position.x-a.root.position.x)[0]:null}
-function say(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';speechSynthesis.speak(u)}
-function note(t){$('feed').textContent=t}
-function setWide(){focusCar=null;focusUntil=0;wideView=true;$('camlabel').textContent='KAMERA: TÜM YARIŞ'}
-function focus(c,label){if(!c)return;wideView=false;focusCar=c;focusUntil=performance.now()+3000;$('camlabel').textContent='KAMERA: '+label+' • '+c.name.toUpperCase();say(label+' '+c.name)}
-function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
-if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);else window.addEventListener('resize',resize);resize();
-for(const n of ['Mavi','Pembe','Altın'])addCar(n);
-function frame(){requestAnimationFrame(frame);const now=performance.now();
- if(phase==="countdown"&&now>=countdownEnd){phase="racing";raceEnd=now+60000;$('status').textContent="Yarışıyor";$('feed').textContent="Başla! 60 saniyelik yarış başladı.";$('camlabel').textContent="KAMERA: LİDERİ TAKİP EDİYOR";say("Başla! Yarış başladı.");}
- if(phase==="racing"&&now>=raceEnd){phase="finished";$('status').textContent="Yarış bitti";$('timer').textContent="00:00";note("60 saniyelik yarış tamamlandı! Kazanan: "+(leader()?.name||"—"));say("Yarış bitti! Kazanan "+(leader()?.name||"—"));}
- if(phase==="racing"){for(const c of cars){const v=c.speed*(c.boost>0?2.3:1);c.root.position.x+=v;if(c.boost>0)c.boost--;c.wheels.forEach(w=>w.rotation.z-=v*1.4);}
-  const sorted=[...cars].sort((a,b)=>b.root.position.x-a.root.position.x);
-  for(let i=0;i<sorted.length;i++){const c=sorted[i],old=previousRanks.indexOf(c);if(old>i&&i===0){focus(c,'ÖNE GEÇTİ');note(c.name+' rakibini geçti! Kamera araca yaklaşıyor.');}}
-  previousRanks=sorted;$('leader').textContent=sorted[0]?.name||'—';
- }
- if(phase==="countdown")$('timer').textContent="00:"+String(Math.max(0,Math.ceil((countdownEnd-now)/1000))).padStart(2,"0");
- else if(phase==="racing")$('timer').textContent="00:"+String(Math.max(0,Math.ceil((raceEnd-now)/1000))).padStart(2,"0");
- else if(phase==="idle"||phase==="finished")$('timer').textContent=phase==="finished"?"00:00":"00:30";
- const lead=leader();if(lead)$('leader').textContent=lead.name;
- if(focusCar&&now>focusUntil){focusCar=null;focusUntil=0;wideView=false;if(lead)$('camlabel').textContent='KAMERA: LİDERİ TAKİP EDİYOR • '+lead.name.toUpperCase();}
- let target,look;
- if(focusCar&&now<=focusUntil){target=focusCar.root.position.clone().add(new THREE.Vector3(-17,8,18));look=focusCar.root.position.clone().add(new THREE.Vector3(5,1,0));}
- else if(wideView){target=new THREE.Vector3(-94,28,48);look=new THREE.Vector3(-94,0,0);}
- else if(lead){target=lead.root.position.clone().add(new THREE.Vector3(-20,11,22));look=lead.root.position.clone().add(new THREE.Vector3(10,1,0));}
- else {target=new THREE.Vector3(-10,32,48);look=new THREE.Vector3(0,0,0)}
- camera.position.lerp(target,.16);camera.lookAt(look);renderer.render(scene,camera);
-}
-frame();
-$('start').onclick=()=>{const now=performance.now();focusCar=null;focusUntil=0;wideView=false;cars.forEach((c,i)=>{c.root.position.x=-105-Math.floor(i/3)*10;c.progress=0;c.boost=0});previousRanks=[...cars].sort((a,b)=>b.root.position.x-a.root.position.x);phase="countdown";countdownEnd=now+30000;$('status').textContent="30 sn sonra";$('timer').textContent="00:30";$('camlabel').textContent="KAMERA: LİDERİ TAKİP EDİYOR";note("30 saniyelik başlama geri sayımı başladı. Ardından yarış 60 saniye sürecek.");say("Yarışa 30 saniye kaldı.")};
-$('pause').onclick=()=>{const now=performance.now();if(phase==="countdown"){pausedFrom="countdown";pausedRemaining=Math.max(0,countdownEnd-now);phase="paused";$('status').textContent="Duraklatıldı";note("Geri sayım duraklatıldı. Devam etmek için Yarışı başlat düğmesine bas.");}else if(phase==="racing"){pausedFrom="racing";pausedRemaining=Math.max(0,raceEnd-now);phase="paused";$('status').textContent="Duraklatıldı";note("Yarış duraklatıldı.");}else if(phase==="paused"){if(pausedFrom==="countdown"){phase="countdown";countdownEnd=now+pausedRemaining;$('status').textContent="Başlama geri sayımı";}else{phase="racing";raceEnd=now+pausedRemaining;$('status').textContent="Yarışıyor";}}};
-$('sound').onclick=()=>{voiceOn=!voiceOn;$('sound').textContent='🔊 Sesli anons: '+(voiceOn?'Açık':'Kapalı');if(voiceOn)say('Sesli anons açık')};
-$('join').onclick=()=>{const name=$('nickname').value.trim().replace(/^@/,'');if(!name){note('Önce yarışçı adını yaz.');return}const c=addCar(name);focus(c,'YENİ YARIŞMACI');note(name+' yarışa katıldı. Kamera 3 saniye onun aracını gösteriyor.');$('nickname').value=''};
-$('gift').onclick=()=>{const c=lastJoiner||leader();if(!c){note('Önce yarışçı ekle.');return}c.boost=180;focus(c,'HEDİYE GÖNDERDİ');note('Demo hediye: '+c.name+' hızlandı! Gerçek hediye gönderen eşleştirmesi TikTok bağlantısı eklenince çalışacak.')};
-})();
-</script></body></html>
+(()=>{const $=id=>document.getElementById(id),canvas=$('game');if(!window.THREE){$('announce').textContent='3D MOTOR YÜKLENEMEDİ';return}
+const scene=new THREE.Scene();const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const camera=new THREE.PerspectiveCamera(48,1,.1,3000);scene.add(new THREE.HemisphereLight(0xe4f2ff,0x4c4035,1.5));const sun=new THREE.DirectionalLight(0xfff0d7,2);sun.position.set(-35,65,40);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+const mat=(c,r=.7,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});const groundMat=mat(0x416448),dirt=mat(0x9a7953),trackMat=mat(0x806448),railMat=mat(0xeadcc2),dark=mat(0x171a20),hoofMat=mat(0x292d33),gold=mat(0xffc52f,.25,.65);
+let world=[];function clearWorld(){world.forEach(o=>scene.remove(o));world=[]}function add(obj){scene.add(obj);world.push(obj);return obj}
+function box(w,h,d,m,x,y,z,parent){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;(parent||scene).add(o);return o}
+const levelNames=['Eşek','Zebra','Midilli','Yarış Atı','Safkan Arap','Şampiyon','Altın At','Efsane','Efsane II','Efsane III','Kozmik Efsane','Efsane Prime'];
+const levelColors=[0x777064,0xe8e8e8,0x9b6540,0x663c25,0x3b211a,0x20252d,0xffc52f,0x9d55ff,0x42d8e8,0xff65bc,0x6b85ff,0xffffff];
+const viewers=[];let phase='idle',raceStart=0,gateAt=0,raceEnd=0,queued=[],lastWinner='—',camMode=0,lastCameraSweep=0,announceUntil=0,activeGiftEffects={},trackChoice=0,sceneChoice=0,soundOn=true;
+const giftOptions=['Atak','Alev Yele','Pegasus','Engel Atla','Kestirme','At Yükselt','Şans Nalı','Nazar Boncuğu','Koruma','Yıldırım','Çamur','Havai Fişek','Geri Çağır'];
+const defaultMap={'Gül':'Atak','Parmak Kalp':'Alev Yele','Aslan':'Pegasus','TikTok Universe':'Pegasus','GG':'At Yükselt','Elmas':'Engel Atla','Kalp':'Şans Nalı'};
+let giftMap={...defaultMap};
+function buildMappings(){const host=$('giftMappings');host.innerHTML='';Object.keys(giftMap).forEach(name=>{const wrap=document.createElement('label');wrap.textContent=name;const sel=document.createElement('select');giftOptions.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;if(v===giftMap[name])o.selected=true;sel.appendChild(o)});sel.onchange=()=>giftMap[name]=sel.value;wrap.appendChild(sel);host.appendChild(wrap)});const add=document.createElement('button');add.textContent='+ Hediye eşleştirmesi ekle';add.onclick=()=>{const n=prompt('TikTok hediye adını yaz');if(n&&!giftMap[n]){giftMap[n]='Atak';buildMappings()}};host.appendChild(add)}buildMappings();
+const sceneLooks=[{sky:0x9fc4d7,fog:0x9fc4d7,ground:0x557a4c,track:0x96795a},{sky:0xf4a46d,fog:0xd58c6c,ground:0x6b6745,track:0x8b6349},{sky:0x101b37,fog:0x182746,ground:0x1e352c,track:0x34343c},{sky:0xdce9f0,fog:0xdce9f0,ground:0xc9d7df,track:0x6e747a},{sky:0xe6ad72,fog:0xe6ad72,ground:0xb99458,track:0x9a7448},{sky:0x82c7db,fog:0x82c7db,ground:0x4e9b70,track:0x9a7657}];
+function buildWorld(){clearWorld();const look=sceneLooks[sceneChoice];scene.background=new THREE.Color(look.sky);scene.fog=new THREE.Fog(look.fog,100,850);groundMat.color.setHex(look.ground);trackMat.color.setHex(look.track);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(1800,240),groundMat);floor.rotation.x=-Math.PI/2;floor.position.set(650,-.3,0);add(floor);
+const lane=new THREE.Mesh(new THREE.PlaneGeometry(1800,23),trackMat);lane.rotation.x=-Math.PI/2;lane.position.set(650,-.15,0);lane.receiveShadow=true;add(lane);
+for(let z of [-12,12]){add(box(1800,.7,.45,railMat,650,.3,z));for(let x=-220;x<1520;x+=18){add(box(1.1,1.2,.5,mat((Math.floor(x/18)%2)?0xffffff:0xc64242),x,.95,z))}}
+for(let x=-200;x<1500;x+=24){for(let side of [-1,1]){const crowd=new THREE.Group();crowd.position.set(x,0,side*17);add(crowd);for(let k=0;k<5;k++){const col=[0x3e75b8,0xc84d58,0xe0b74b,0xe8e8e8,0x43a783][(Math.floor(x/24)+k)%5];const body=new THREE.Mesh(new THREE.CylinderGeometry(.22,.3,.8,7),mat(col));body.position.set(k*.75,.65,0);crowd.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.22,8,8),mat(0xd7ad8c));head.position.set(k*.75,1.2,0);crowd.add(head)}}}
+for(let x=-220;x<1520;x+=95){for(let z of [-24,24]){const tree=new THREE.Group();tree.position.set(x,0,z);add(tree);const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.4,.55,5,7),mat(0x59412c));trunk.position.y=2.5;tree.add(trunk);const crown=new THREE.Mesh(new THREE.ConeGeometry(3.5,8,8),mat(sceneChoice===3?0xf1f5f8:sceneChoice===4?0x96753b:0x315b3d));crown.position.y=8;tree.add(crown)}}}
+buildWorld();
+function makeHorse(name,index){const root=new THREE.Group();scene.add(root);const coat=mat(0x777064,.72),mane=mat(0x211b19),white=mat(0xf4f1e8),eye=mat(0x090909),hoof=hoofMat;const body=new THREE.Mesh(new THREE.SphereGeometry(1,18,14),coat);body.scale.set(1.45,.68,.58);body.position.set(0,1.55,0);body.castShadow=true;root.add(body);
+const chest=new THREE.Mesh(new THREE.SphereGeometry(.62,14,12),coat);chest.scale.set(.75,1.2,.72);chest.position.set(.95,1.65,0);root.add(chest);
+const neck=new THREE.Mesh(new THREE.CylinderGeometry(.27,.48,1.35,12),coat);neck.position.set(1.05,2.25,0);neck.rotation.z=-.43;root.add(neck);
+const head=new THREE.Mesh(new THREE.SphereGeometry(.4,14,12),coat);head.scale.set(1.15,.75,.72);head.position.set(1.62,2.85,0);root.add(head);
+const muzzle=new THREE.Mesh(new THREE.SphereGeometry(.24,12,10),coat);muzzle.scale.set(1.2,.7,.8);muzzle.position.set(1.95,2.68,0);root.add(muzzle);
+for(let z of [-.23,.23]){const e=new THREE.Mesh(new THREE.SphereGeometry(.065,8,8),eye);e.position.set(1.66,2.94,z);root.add(e);const ear=new THREE.Mesh(new THREE.ConeGeometry(.12,.5,8),coat);ear.position.set(1.35,3.3,z*.8);ear.rotation.z=-.2;root.add(ear)}
+const tail=new THREE.Mesh(new THREE.ConeGeometry(.22,1.05,9),mane);tail.position.set(-1.48,1.6,0);tail.rotation.z=Math.PI/2;root.add(tail);
+const maneMesh=new THREE.Mesh(new THREE.ConeGeometry(.36,1.2,10),mane);maneMesh.position.set(.85,2.95,0);maneMesh.rotation.z=-.4;root.add(maneMesh);
+const legs=[];for(let x of [-.85,.92])for(let z of [-.38,.38]){const leg=new THREE.Group();leg.position.set(x,1.25,z);const upper=new THREE.Mesh(new THREE.CylinderGeometry(.16,.12,.72,10),coat);upper.position.y=-.35;leg.add(upper);const lower=new THREE.Mesh(new THREE.CylinderGeometry(.105,.085,.62,10),coat);lower.position.set(.03,-.95,0);leg.add(lower);const hoofMesh=new THREE.Mesh(new THREE.CylinderGeometry(.13,.16,.2,10),hoof);hoofMesh.position.set(.03,-1.34,0);leg.add(hoofMesh);root.add(leg);legs.push(leg)}
+const stripe=box(.035,.16,.035,white,1.9,2.85,.25,root);const rider= new THREE.Group();rider.position.set(-.1,2.25,0);root.add(rider);const riderBody=new THREE.Mesh(new THREE.SphereGeometry(.25,10,10),mat(0x25354a));riderBody.scale.set(.8,1.3,.8);rider.add(riderBody);
+const lane=index%5;root.position.set(-130-Math.floor(index/5)*7,0,(lane-2)*4.3);root.scale.setScalar(1);return{name,root,legs,body,coat,mane:maneMesh,tail,level:1,coins:0,boost:0,slow:0,shield:0,flight:0,fire:0,progress:0,base:.105+Math.random()*.025,lane,cheer:0,queued:[]}}
+function addViewer(name){name=(name||'Misafir').trim().slice(0,18)||'Misafir';let existing=viewers.find(v=>v.name.toLowerCase()===name.toLowerCase());if(existing)return existing;const h=makeHorse(name,viewers.length);viewers.push(h);$('runners').textContent=viewers.length;return h}
+function say(t){if(!soundOn||!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';speechSynthesis.cancel();speechSynthesis.speak(u)}
+function shout(t,ms=2200){$('announce').textContent=t;announceUntil=performance.now()+ms}
+function updateLevel(h,amount=1){h.level=Math.min(12,h.level+amount);const c=levelColors[h.level-1];h.coat.color.setHex(c);if(h.level>=7){h.mane.material.color.setHex(h.level===7?0xffd83d:h.level>=8?0x8c50ff:0x42d9e7);h.body.material.emissive=new THREE.Color(h.level>=8?0x291044:0x332400);h.body.material.emissiveIntensity=.32}h.root.scale.setScalar(1+(h.level-1)*.012);say(h.name+' seviye '+h.level+' '+levelNames[h.level-1]);}
+function applyEffect(h,effect,coins=1){if(phase==='countdown'||phase==='idle'){queued.push({h,effect,coins});return}switch(effect){case'Atak':h.boost+=Math.max(5,coins*1.5);break;case'Alev Yele':h.fire=8;h.boost+=5;break;case'Pegasus':h.flight=7;h.boost+=8;break;case'Engel Atla':h.boost+=7;break;case'Kestirme':h.boost+=12;h.root.position.z=Math.max(-9,Math.min(9,h.root.position.z+(Math.random()-.5)*5));break;case'At Yükselt':updateLevel(h);h.boost+=3;break;case'Şans Nalı':h.boost+=10;break;case'Nazar Boncuğu':h.shield=10;break;case'Koruma':h.shield=12;break;case'Yıldırım':h.slow=4;break;case'Çamur':h.slow=6;break;case'Havai Fişek':h.cheer=3;shout('🎆 '+h.name+'!');break;case'Geri Çağır':h.slow=8;h.root.position.x-=10;break;} }
+function runQueued(){queued.forEach(q=>applyEffect(q.h,q.effect,q.coins));queued=[]}
+function gift(h,name,coins){const effect=giftMap[name];if(effect){applyEffect(h,effect,coins);shout('🎁 '+h.name+' • '+effect)}else{h.boost+=coins;h.coins+=coins;const ups=Math.floor(h.coins/100);if(ups){h.coins%=100;updateLevel(h,ups)}shout('✨ '+h.name+' ATAK!')}}
+function resetRace(){phase='idle';viewers.forEach((h,i)=>{h.root.position.x=-130-Math.floor(i/5)*7;h.boost=0;h.slow=0;h.progress=0;h.root.position.y=0});$('raceState').textContent='KAPI AÇILMAYI BEKLİYOR';$('timer').textContent='00:15';$('winner').textContent=lastWinner;shout('AT ARENASI');}
+function startRace(){trackChoice=+$('track').value;sceneChoice=+$('scene').value;buildWorld();const sec=Math.max(3,Math.min(60,+$('countdown').value||15));phase='countdown';gateAt=performance.now()+sec*1000;raceEnd=gateAt+Math.max(20,Math.min(300,+$('duration').value||90))*1000;$('raceState').textContent='KAPILAR AÇILIYOR';shout('YERLERİNİZİ ALIN!',sec*1000);say('Yarış başlamak üzere');}
+function leader(){return [...viewers].sort((a,b)=>b.root.position.x-a.root.position.x)[0]}
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}new ResizeObserver(resize).observe(canvas);resize();
+function animate(){requestAnimationFrame(animate);const now=performance.now();if(phase==='countdown'){const left=Math.max(0,Math.ceil((gateAt-now)/1000));$('timer').textContent='00:'+String(left).padStart(2,'0');if(left<=3)shout(left?String(left):'GO!',900);if(now>=gateAt){phase='race';raceStart=now;$('raceState').textContent='YARIŞ DEVAM EDİYOR';shout('🏁 KAPILAR AÇILDI!',2600);say('Kapılar açıldı! Dört nala!');runQueued()}}
+if(phase==='race'){const left=Math.max(0,Math.ceil((raceEnd-now)/1000));$('timer').textContent=''+String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');for(const h of viewers){let speed=h.base*(1+(h.level-1)*.075);if(h.boost>0){speed*=2.4;h.boost=Math.max(0,h.boost-.016)}if(h.slow>0){speed*=.35;h.slow=Math.max(0,h.slow-.016)}if(h.shield>0)h.shield-=.016;if(h.flight>0){h.flight-=.016;h.root.position.y=1.5+Math.sin(now*.012)*.4}else h.root.position.y+=(0-h.root.position.y)*.15;if(h.fire>0)h.fire-=.016;h.root.position.x+=speed;h.legs.forEach((l,i)=>l.rotation.z=Math.sin(now*.018+(i%2)*Math.PI)*.65);h.tail.rotation.x=Math.sin(now*.009)*.3;h.mane.rotation.x=Math.sin(now*.012)*.2;}
+const lead=leader();if(lead)$('leader').textContent=lead.name+' • '+levelNames[lead.level-1];if(now>=raceEnd){phase='done';lastWinner=lead?.name||'—';$('winner').textContent=lastWinner;$('raceState').textContent='YARIŞ TAMAMLANDI';shout('🏆 '+lastWinner+' KAZANDI!',6000);say('Yarış tamamlandı. Kazanan '+lastWinner)}}
+if(phase==='idle'||phase==='done')$('timer').textContent=phase==='done'?'00:00':'00:15';
+const lead=leader();let target,look;if(lead&&phase==='race'){const sweep=Math.sin(now*.00035)*10;target=lead.root.position.clone().add(new THREE.Vector3(-24,14,27+sweep));look=lead.root.position.clone().add(new THREE.Vector3(5,1.4,0));}else if(lead){target=lead.root.position.clone().add(new THREE.Vector3(-36,23,38));look=lead.root.position.clone()}else{target=new THREE.Vector3(-35,30,42);look=new THREE.Vector3(0,0,0)}
+camera.position.lerp(target,.065);camera.lookAt(look);renderer.render(scene,camera);if(now>announceUntil&&phase==='idle')$('announce').textContent='AT ARENASI'}
+animate();
+$('stage').addEventListener('click',()=>{if($('shade').classList.contains('open'))return;$('shade').classList.add('open')});$('close').onclick=()=>$('shade').classList.remove('open');$('start').onclick=startRace;$('reset').onclick=resetRace;
+function chosen(){return $('viewer').value.trim()||'Misafir '+(viewers.length+1)}
+$('join').onclick=()=>{const h=addViewer(chosen());shout(h.name+' PİSTE KATILDI');$('viewer').value=''};$('comment').onclick=()=>{const h=addViewer(chosen());h.cheer=2;shout('💬 '+h.name+' YORUM YAZDI');$('viewer').value=''};$('like').onclick=()=>{const h=leader()||addViewer(chosen());h.cheer=2;h.boost+=1.5;shout('❤️ TEZAHÜRAT! '+h.name)};$('follow').onclick=()=>{const h=addViewer(chosen());h.boost+=8;shout('➕ '+h.name+' TAKİP ETTİ • ATAK!');$('viewer').value=''};
+$('sendGift').onclick=()=>{const h=addViewer(chosen()),n=$('giftName').value.trim()||'Hediye',c=Math.max(1,+$('coins').value||1);gift(h,n,c);$('viewer').value=''};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('shade').classList.toggle('open')});
+window.addEventListener('beforeunload',()=>speechSynthesis?.cancel());
+})();</script></body></html>
