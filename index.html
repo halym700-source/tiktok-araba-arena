@@ -8,7 +8,7 @@
 header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}h1{font-size:clamp(20px,5vw,31px);margin:0}.pill{font-size:11px;color:#a9bddb;border:1px solid #34435d;padding:7px 10px;border-radius:30px}
 #stage{position:relative;overflow:hidden;border:1px solid #34435d;border-radius:16px;background:#111b2b;box-shadow:0 16px 50px #0009}#game{display:block;width:100%;height:clamp(280px,64vw,600px);touch-action:pan-y}
 #camlabel{position:absolute;top:10px;left:10px;background:#080e1bdc;border:1px solid #60718e;border-radius:10px;padding:8px 11px;font-size:11px;font-weight:800;letter-spacing:.4px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:9px 0}.stat,.panel{background:#131d2e;border:1px solid #2d3b55;border-radius:12px;padding:10px}.stat small{display:block;color:#9bacc7;font-size:10px}.stat strong{font-size:17px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:9px 0}@media(min-width:560px){.stats{grid-template-columns:repeat(4,1fr)}}.stat,.panel{background:#131d2e;border:1px solid #2d3b55;border-radius:12px;padding:10px}.stat small{display:block;color:#9bacc7;font-size:10px}.stat strong{font-size:17px}
 .controls{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}button,input{font:inherit}button{border:0;border-radius:11px;padding:12px 8px;color:white;background:#293957;font-weight:750}button.primary{background:linear-gradient(100deg,#08b9dc,#286cff)}button.gift{background:linear-gradient(100deg,#ed3e96,#9047ff)}button:active{transform:scale(.98)}
 .join{display:flex;gap:7px;margin-top:8px}.join input{min-width:0;flex:1;background:#0c1424;color:white;border:1px solid #33425e;border-radius:11px;padding:11px}
 .panel{margin-top:9px}.panel h2{font-size:14px;margin:0 0 6px}.feed{font-size:12px;color:#c1cce0;min-height:32px;line-height:1.5}.hint{font-size:11px;color:#8fa1c0;line-height:1.55}
@@ -17,7 +17,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px;fle
 <body><main>
 <header><h1>🏁 ARABA ARENA 3D</h1><span class="pill">3D SPOR OTOMOBİLLER • DÜZ PİST</span></header>
 <div id="stage"><canvas id="game"></canvas><div id="camlabel">KAMERA: TÜM YARIŞ</div></div>
-<div class="stats"><div class="stat"><small>YARIŞ DURUMU</small><strong id="status">Hazır</strong></div><div class="stat"><small>LİDER</small><strong id="leader">Henüz yok</strong></div><div class="stat"><small>YARIŞÇI</small><strong id="count">0</strong></div></div>
+<div class="stats"><div class="stat"><small>YARIŞ DURUMU</small><strong id="status">Hazır</strong></div><div class="stat"><small>LİDER</small><strong id="leader">Henüz yok</strong></div><div class="stat"><small>YARIŞÇI</small><strong id="count">0</strong></div><div class="stat"><small>KALAN SÜRE</small><strong id="timer">00:30</strong></div></div>
 <div class="controls"><button class="primary" id="start">▶ Yarışı başlat</button><button id="pause">Ⅱ Duraklat</button><button class="gift" id="gift">🎁 Hediye simüle et</button><button id="sound">🔊 Sesli anons: Açık</button></div>
 <div class="join"><input id="nickname" maxlength="18" placeholder="Yarışçı adı (ör. ali)"><button class="primary" id="join">+ Yarışçı ekle</button></div>
 <div class="panel"><h2>📣 Yarış olayları</h2><div class="feed" id="feed">Yeni 3D arena hazır. Yarışı başlatabilir veya isim girip yarışçı ekleyebilirsin.</div></div>
@@ -28,21 +28,21 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px;fle
 (()=> {
 const $=id=>document.getElementById(id),canvas=$('game');
 if(!window.THREE){$('feed').textContent='3D motor yüklenemedi. İnternet bağlantısını kontrol edip sayfayı yenile.';return;}
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bb9d0);scene.fog=new THREE.Fog(0x9bb9d0,100,280);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bb9d0);scene.fog=new THREE.Fog(0x9bb9d0,500,2600);
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.7));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-const camera=new THREE.PerspectiveCamera(43,1,.1,500);
+const camera=new THREE.PerspectiveCamera(43,1,.1,5000);
 scene.add(new THREE.HemisphereLight(0xd9edff,0x28313b,1.55));
 const sun=new THREE.DirectionalLight(0xffffff,2.1);sun.position.set(-45,70,35);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
 const mat=(c,r=.45,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 const asphalt=mat(0x252b34,.94),white=mat(0xf2f3f5,.55),rubber=mat(0x080a0e,.98),chrome=mat(0xaebdca,.22,.88),glass= new THREE.MeshPhysicalMaterial({color:0x152b3c,roughness:.13,metalness:.35,transparent:true,opacity:.9});
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(500,220),mat(0x47604b));ground.rotation.x=-Math.PI/2;ground.position.y=-.22;ground.receiveShadow=true;scene.add(ground);
-const track=new THREE.Mesh(new THREE.PlaneGeometry(280,27),asphalt);track.rotation.x=-Math.PI/2;track.position.y=-.16;track.receiveShadow=true;scene.add(track);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(12000,220),mat(0x47604b));ground.rotation.x=-Math.PI/2;ground.position.y=-.22;ground.receiveShadow=true;scene.add(ground);
+const track=new THREE.Mesh(new THREE.PlaneGeometry(12000,27),asphalt);track.rotation.x=-Math.PI/2;track.position.y=-.16;track.receiveShadow=true;scene.add(track);
 function box(w,h,d,material,x,y,z,parent){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
-for(let z of [-13.4,13.4])box(280,.18,.28,white,0,-.06,z,scene);
-for(let z of [-4.5,4.5])for(let x=-130;x<140;x+=12)box(5,.025,.09,mat(0xc9d0d7),x,-.065,z,scene);
-for(let x=-126;x<=126;x+=18){box(.12,.02,27,mat(0x68717c),x,-.065,0,scene)}
-// Pit-side barriers and distant simple grandstands
-for(let z of [-17,17]){box(280,1,.55,mat(0xd8e0e7),0,.35,z,scene);for(let x=-125;x<130;x+=8)box(3,.18,.62,mat(x%16?0xe23a45:0xf4f4f4),x,.95,z,scene)}
+for(let z of [-13.4,13.4])box(12000,.18,.28,white,0,-.06,z,scene);
+// Long dashed lane lines: one lightweight geometry for each lane
+for(let z of [-4.5,4.5]){const pts=[];for(let x=-5990;x<=5990;x+=18){pts.push(new THREE.Vector3(x,-.055,z),new THREE.Vector3(x+8,-.055,z))}const g=new THREE.BufferGeometry().setFromPoints(pts);scene.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xc9d0d7})))}
+// Endless-looking safety barriers along the straight
+for(let z of [-17,17])box(12000,1,.55,mat(0xd8e0e7),0,.35,z,scene);
 // start / finish checker pattern
 for(let i=0;i<12;i++)for(let j=0;j<4;j++){const c=(i+j)%2?0xffffff:0x11151b;box(1,.045,1.5,mat(c),-105+i*1.5,-.04,-8.25+j*1.5,scene)}
 const colors=[0x13bce8,0xf13d79,0xffbd36,0x8d68ff,0x5bd17a,0xf16c32,0xe9edf5,0x20c5a3,0xff5cce,0x8ea3b8];
@@ -75,10 +75,10 @@ function makeCar(name,color,index){
  const tag=box(1.4,.28,.04,mat(0x111722),0,2.12,0,root);
  const glow=new THREE.PointLight(color,0,12);glow.position.set(-2,.8,0);root.add(glow);
  const lane=index%3,row=Math.floor(index/3);
- root.position.set(-112-row*10,0,(lane-1)*7.5);
+ root.position.set(-105-row*10,0,(lane-1)*7.5);
  return{name,root,wheels,glow,color,progress:0,speed:.32+Math.random()*.12,boost:0,lane};
 }
-const cars=[];let running=false,voiceOn=true,lastJoiner=null,focusCar=null,focusUntil=0,previousRanks=[],nextId=0,lastLeader=null,wideView=true;
+const cars=[];let phase="idle",voiceOn=true,lastJoiner=null,focusCar=null,focusUntil=0,previousRanks=[],nextId=0,wideView=false,countdownEnd=0,raceEnd=0,pausedRemaining=0;
 function addCar(name){const c=makeCar(name,colors[nextId%colors.length],nextId);nextId++;cars.push(c);lastJoiner=c;$('count').textContent=cars.length;$('leader').textContent=leader()?.name||'Henüz yok';return c}
 function leader(){return cars.length?[...cars].sort((a,b)=>b.root.position.x-a.root.position.x)[0]:null}
 function say(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';speechSynthesis.speak(u)}
@@ -89,11 +89,16 @@ function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)ret
 if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);else window.addEventListener('resize',resize);resize();
 for(const n of ['Mavi','Pembe','Altın'])addCar(n);
 function frame(){requestAnimationFrame(frame);const now=performance.now();
- if(running){for(const c of cars){const v=c.speed*(c.boost>0?2.3:1);c.root.position.x+=v;if(c.boost>0)c.boost--;c.wheels.forEach(w=>w.rotation.z-=v*1.4);if(c.root.position.x>112){c.progress++;c.root.position.x=-112-Math.floor(cars.indexOf(c)/3)*10;}}
-  const sorted=[...cars].sort((a,b)=>b.root.position.x-a.root.position.x);const current=sorted.map(c=>c.name);
+ if(phase==="countdown"&&now>=countdownEnd){phase="racing";raceEnd=now+60000;$('status').textContent="Yarışıyor";$('feed').textContent="Başla! 60 saniyelik yarış başladı.";$('camlabel').textContent="KAMERA: LİDERİ TAKİP EDİYOR";say("Başla! Yarış başladı.");}
+ if(phase==="racing"&&now>=raceEnd){phase="finished";$('status').textContent="Yarış bitti";$('timer').textContent="00:00";note("60 saniyelik yarış tamamlandı! Kazanan: "+(leader()?.name||"—"));say("Yarış bitti! Kazanan "+(leader()?.name||"—"));}
+ if(phase==="racing"){for(const c of cars){const v=c.speed*(c.boost>0?2.3:1);c.root.position.x+=v;if(c.boost>0)c.boost--;c.wheels.forEach(w=>w.rotation.z-=v*1.4);}
+  const sorted=[...cars].sort((a,b)=>b.root.position.x-a.root.position.x);
   for(let i=0;i<sorted.length;i++){const c=sorted[i],old=previousRanks.indexOf(c);if(old>i&&i===0){focus(c,'ÖNE GEÇTİ');note(c.name+' rakibini geçti! Kamera araca yaklaşıyor.');}}
   previousRanks=sorted;$('leader').textContent=sorted[0]?.name||'—';
  }
+ if(phase==="countdown")$('timer').textContent="00:"+String(Math.max(0,Math.ceil((countdownEnd-now)/1000))).padStart(2,"0");
+ else if(phase==="racing"){$('timer').textContent="01:"+String(Math.max(0,Math.ceil((raceEnd-now)/1000))-1).padStart(2,"0");$('timer').textContent="00:"+String(Math.max(0,Math.ceil((raceEnd-now)/1000))).padStart(2,"0");}
+ else if(phase==="idle"||phase==="finished")$('timer').textContent=phase==="finished"?"00:00":"00:30";
  const lead=leader();if(lead)$('leader').textContent=lead.name;
  if(focusCar&&now>focusUntil){focusCar=lead;focusUntil=Infinity;wideView=false;if(lead)$('camlabel').textContent='KAMERA: LİDER • '+lead.name.toUpperCase();}
  let target,look;
@@ -104,8 +109,8 @@ function frame(){requestAnimationFrame(frame);const now=performance.now();
  camera.position.lerp(target,.055);camera.lookAt(look);renderer.render(scene,camera);
 }
 frame();
-$('start').onclick=()=>{running=true;$('status').textContent='Yarışıyor';setWide();note('Yarış başladı! Kamera önce bütün pisti ve araçları gösteriyor.');say('Yarış başlıyor!')};
-$('pause').onclick=()=>{running=false;$('status').textContent='Duraklatıldı';note('Yarış duraklatıldı.')};
+$('start').onclick=()=>{const now=performance.now();focusCar=null;focusUntil=0;wideView=false;cars.forEach((c,i)=>{c.root.position.x=-105-Math.floor(i/3)*10;c.progress=0;c.boost=0});previousRanks=[...cars].sort((a,b)=>b.root.position.x-a.root.position.x);phase="countdown";countdownEnd=now+30000;$('status').textContent="30 sn sonra";$('timer').textContent="00:30";$('camlabel').textContent="KAMERA: LİDERİ TAKİP EDİYOR";note("30 saniyelik başlama geri sayımı başladı. Ardından yarış 60 saniye sürecek.");say("Yarışa 30 saniye kaldı.")};
+$('pause').onclick=()=>{const now=performance.now();if(phase==="countdown"){pausedRemaining=Math.max(0,countdownEnd-now);phase="paused";$('status').textContent="Duraklatıldı";note("Geri sayım duraklatıldı. Devam etmek için Yarışı başlat düğmesine bas.");}else if(phase==="racing"){pausedRemaining=Math.max(0,raceEnd-now);phase="paused";$('status').textContent="Duraklatıldı";note("Yarış duraklatıldı.");}else if(phase==="paused"){phase="racing";raceEnd=now+pausedRemaining;$('status').textContent="Yarışıyor";}};
 $('sound').onclick=()=>{voiceOn=!voiceOn;$('sound').textContent='🔊 Sesli anons: '+(voiceOn?'Açık':'Kapalı');if(voiceOn)say('Sesli anons açık')};
 $('join').onclick=()=>{const name=$('nickname').value.trim().replace(/^@/,'');if(!name){note('Önce yarışçı adını yaz.');return}const c=addCar(name);focus(c,'YENİ YARIŞMACI');note(name+' yarışa katıldı. Kamera 3 saniye onun aracını gösteriyor.');$('nickname').value=''};
 $('gift').onclick=()=>{const c=lastJoiner||leader();if(!c){note('Önce yarışçı ekle.');return}c.boost=180;focus(c,'HEDİYE GÖNDERDİ');note('Demo hediye: '+c.name+' hızlandı! Gerçek hediye gönderen eşleştirmesi TikTok bağlantısı eklenince çalışacak.')};
