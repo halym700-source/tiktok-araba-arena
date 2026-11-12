@@ -98,6 +98,7 @@ function frame(){requestAnimationFrame(frame);const now=performance.now();
  if(focusCar&&now>focusUntil){focusCar=lead;focusUntil=Infinity;wideView=false;if(lead)$('camlabel').textContent='KAMERA: LİDER • '+lead.name.toUpperCase();}
  let target,look;
  if(focusCar&&now<=focusUntil){target=focusCar.root.position.clone().add(new THREE.Vector3(-10,6,8));look=focusCar.root.position.clone().add(new THREE.Vector3(1,1,0));}
+ else if(wideView){target=new THREE.Vector3(-94,28,48);look=new THREE.Vector3(-94,0,0);}
  else if(lead){target=lead.root.position.clone().add(new THREE.Vector3(-24,18,34));look=lead.root.position.clone().add(new THREE.Vector3(8,0,0));}
  else {target=new THREE.Vector3(-10,32,48);look=new THREE.Vector3(0,0,0)}
  camera.position.lerp(target,.055);camera.lookAt(look);renderer.render(scene,camera);
