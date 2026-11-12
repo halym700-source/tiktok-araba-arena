@@ -47,17 +47,20 @@ const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 const $=id=>document.getElementById(id);
 let cars=[],running=false,voiceOn=true,last=0,lap=0,raf=0;
 const palette=['#37dcff','#ff559b','#ffd35a','#9b83ff','#63e58c','#ff8b52'];
-function makeCar(name){return{name,x:480,y:270,angle:Math.random()*6.28,speed:0.7+Math.random()*0.45,color:palette[cars.length%palette.length],turbo:0,progress:0}}
+function makeCar(name){const lane=cars.length;return{name,x:120-lane*45,y:180+lane*90,angle:0,speed:1.25+Math.random()*0.25,color:palette[lane%palette.length],turbo:0,progress:0}}
 cars=[makeCar('Mavi'),makeCar('Pembe'),makeCar('Altın')];
 function say(t){if(!voiceOn||!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';u.rate=1.05;speechSynthesis.speak(u)}
 function note(t){$('feed').textContent=t}
 function drawTrack(){
  ctx.fillStyle='#172b2b';ctx.fillRect(0,0,960,540);
- ctx.fillStyle='#273342';ctx.beginPath();ctx.ellipse(480,270,390,205,0,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#172b2b';ctx.beginPath();ctx.ellipse(480,270,260,105,0,0,Math.PI*2);ctx.fill();
- ctx.strokeStyle='#d6e0eb';ctx.lineWidth=5;ctx.setLineDash([18,14]);ctx.beginPath();ctx.ellipse(480,270,325,155,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
- ctx.fillStyle='#dce7f5';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText('ARENA',480,278);
- for(let i=0;i<12;i++){let a=i*Math.PI/6;let x=480+390*Math.cos(a),y=270+205*Math.sin(a);ctx.fillStyle=i%2?'#ff4d9d':'#36e2ff';ctx.fillRect(x-5,y-5,10,10)}
+ ctx.fillStyle='#303b4b';ctx.fillRect(55,95,850,350);
+ ctx.fillStyle='#222d3d';ctx.fillRect(55,105,850,330);
+ ctx.strokeStyle='#e7edf7';ctx.lineWidth=4;ctx.setLineDash([24,18]);
+ [225,315].forEach(y=>{ctx.beginPath();ctx.moveTo(70,y);ctx.lineTo(890,y);ctx.stroke()});ctx.setLineDash([]);
+ ctx.fillStyle='#dce7f5';ctx.font='bold 18px system-ui';ctx.textAlign='center';ctx.fillText('BAŞLANGIÇ',115,75);
+ ctx.fillStyle='#36e2ff';ctx.fillRect(105,105,8,330);
+ ctx.fillStyle='#ff4d9d';ctx.fillRect(850,105,8,330);
+ ctx.fillStyle='#9eabc2';ctx.font='bold 14px system-ui';ctx.fillText('FİNİŞ',855,75);
 }
 function drawCar(c){
  ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.angle);
@@ -70,15 +73,15 @@ function drawCar(c){
 }
 function render(t=0){
  const dt=Math.min((t-last)/16||1,2);last=t;drawTrack();
- if(running){cars.forEach(c=>{c.angle+=.006*c.speed*dt*(c.turbo>0?2.2:1);c.x=480+325*Math.cos(c.angle);c.y=270+155*Math.sin(c.angle);c.progress+=.001*c.speed*dt;if(c.turbo>0)c.turbo--});lap=Math.max(lap,Math.floor(Math.max(...cars.map(c=>c.progress))));$('lap').textContent=lap}
+ if(running){cars.forEach(c=>{c.x+=(c.speed+(c.turbo>0?2.8:0))*dt*1.5;if(c.x>850){c.x=120;c.progress++;}if(c.turbo>0)c.turbo--});lap=Math.max(lap,...cars.map(c=>c.progress));$('lap').textContent=lap}
  cars.forEach(drawCar);$('count').textContent=cars.length;
  raf=requestAnimationFrame(render);
 }
-function addCar(name){if(cars.length>=8){note('Arena dolu: en fazla 8 araç.');return}cars.push(makeCar(name||'Oyuncu '+(cars.length+1)));note((name||'Yeni oyuncu')+' yarışa katıldı!');say((name||'Yeni oyuncu')+' yarışa katıldı');}
+function addCar(name){note('Bu yarışta araç sayısı sabit: 3. Yeni oyuncu için mevcut araçlardan biri seçilmeli.');}
 $('start').onclick=()=>{running=!running;$('status').textContent=running?'Yarışıyor':'Duraklatıldı';$('start').textContent=running?'Ⅱ Duraklat':'▶ Devam et';if(running)say('Yarış başlıyor! Hazır, başla!');note(running?'Yarış başladı!':'Yarış duraklatıldı.')};
 $('add').onclick=()=>addCar();$('turbo').onclick=()=>{if(!cars.length)return;let c=cars[Math.floor(Math.random()*cars.length)];c.turbo=100;note(c.name+' turbo aldı!');say(c.name+' turbo aldı!')};
 $('voice').onclick=()=>{voiceOn=!voiceOn;$('voice').textContent='🔊 Sesli anons: '+(voiceOn?'Açık':'Kapalı');if(voiceOn)say('Sesli anons açık')};
-$('join').onclick=()=>{let n=$('nickname').value.trim().replace(/^@/,'');if(!n){note('Önce bir oyuncu adı yaz.');return}addCar(n);$('nickname').value=''};
+$('join').onclick=()=>{let n=$('nickname').value.trim().replace(/^@/,'');if(!n){note('Önce bir oyuncu adı yaz.');return}note('3 araç sınırı dolu. '+n+' sonraki yarışa katılabilir.');$('nickname').value=''};
 $('nickname').addEventListener('keydown',e=>{if(e.key==='Enter')$('join').click()});
 render();
 </script>
