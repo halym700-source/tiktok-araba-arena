@@ -30,7 +30,7 @@ const $=id=>document.getElementById(id),canvas=$('game');
 if(!window.THREE){$('feed').textContent='3D motor yüklenemedi. İnternet bağlantısını kontrol edip sayfayı yenile.';return;}
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bb9d0);scene.fog=new THREE.Fog(0x9bb9d0,500,2600);
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.7));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-const camera=new THREE.PerspectiveCamera(43,1,.1,5000);
+const camera=new THREE.PerspectiveCamera(52,1,.1,5000);
 scene.add(new THREE.HemisphereLight(0xd9edff,0x28313b,1.55));
 const sun=new THREE.DirectionalLight(0xffffff,2.1);sun.position.set(-45,70,35);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
 const mat=(c,r=.45,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
@@ -100,13 +100,13 @@ function frame(){requestAnimationFrame(frame);const now=performance.now();
  else if(phase==="racing")$('timer').textContent="00:"+String(Math.max(0,Math.ceil((raceEnd-now)/1000))).padStart(2,"0");
  else if(phase==="idle"||phase==="finished")$('timer').textContent=phase==="finished"?"00:00":"00:30";
  const lead=leader();if(lead)$('leader').textContent=lead.name;
- if(focusCar&&now>focusUntil){focusCar=lead;focusUntil=Infinity;wideView=false;if(lead)$('camlabel').textContent='KAMERA: LİDER • '+lead.name.toUpperCase();}
+ if(focusCar&&now>focusUntil){focusCar=null;focusUntil=0;wideView=false;if(lead)$('camlabel').textContent='KAMERA: LİDERİ TAKİP EDİYOR • '+lead.name.toUpperCase();}
  let target,look;
- if(focusCar&&now<=focusUntil){target=focusCar.root.position.clone().add(new THREE.Vector3(-10,6,8));look=focusCar.root.position.clone().add(new THREE.Vector3(1,1,0));}
+ if(focusCar&&now<=focusUntil){target=focusCar.root.position.clone().add(new THREE.Vector3(-17,8,18));look=focusCar.root.position.clone().add(new THREE.Vector3(5,1,0));}
  else if(wideView){target=new THREE.Vector3(-94,28,48);look=new THREE.Vector3(-94,0,0);}
- else if(lead){target=lead.root.position.clone().add(new THREE.Vector3(-24,18,34));look=lead.root.position.clone().add(new THREE.Vector3(8,0,0));}
+ else if(lead){target=lead.root.position.clone().add(new THREE.Vector3(-20,11,22));look=lead.root.position.clone().add(new THREE.Vector3(10,1,0));}
  else {target=new THREE.Vector3(-10,32,48);look=new THREE.Vector3(0,0,0)}
- camera.position.lerp(target,.055);camera.lookAt(look);renderer.render(scene,camera);
+ camera.position.lerp(target,.16);camera.lookAt(look);renderer.render(scene,camera);
 }
 frame();
 $('start').onclick=()=>{const now=performance.now();focusCar=null;focusUntil=0;wideView=false;cars.forEach((c,i)=>{c.root.position.x=-105-Math.floor(i/3)*10;c.progress=0;c.boost=0});previousRanks=[...cars].sort((a,b)=>b.root.position.x-a.root.position.x);phase="countdown";countdownEnd=now+30000;$('status').textContent="30 sn sonra";$('timer').textContent="00:30";$('camlabel').textContent="KAMERA: LİDERİ TAKİP EDİYOR";note("30 saniyelik başlama geri sayımı başladı. Ardından yarış 60 saniye sürecek.");say("Yarışa 30 saniye kaldı.")};
