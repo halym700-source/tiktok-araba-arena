@@ -82,7 +82,7 @@ function frame(){
   previousOrder=order;
  }
  const lead=leader();$('leader').textContent=lead.name;
- if(focusCar&&now>focusUntil){setWide();focusCar=null;}
+ if(focusCar&&now>focusUntil){focusCar=lead;focusUntil=Infinity;$('camlabel').textContent='KAMERA: LİDER — '+lead.name.toUpperCase();}
  let target,look;
  if(focusCar&&now<=focusUntil){target=focusCar.root.position.clone().add(new THREE.Vector3(-9,6,8));look=focusCar.root.position.clone().add(new THREE.Vector3(2,.8,0));}
  else {target=new THREE.Vector3(-7,25,38);look=new THREE.Vector3(0,0,0);}
