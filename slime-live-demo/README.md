@@ -1,23 +1,31 @@
-# Slime Live — 3D Gift Demo
+# Slime Live — local LIVE bridge
 
-Ayrı demo klasörü: TikTok LIVE slime etkileşim prototipi.
+This folder contains the browser scene and a local Node.js bridge for OBS.
 
-## Demo
-GitHub Pages üzerinden yayınlandığında:
-https://halym700-source.github.io/tiktok-araba-arena/slime-live-demo/
+## Run locally (PC required)
 
-## Bu sürümde
-- Tarayıcıda çalışan Three.js 3D sahne
-- Mor/nane tonlarında hareketli, parlak slime
-- Basit 3D sunucu karakter prototipi
-- Gül, kalp, çiçek, elmas ve aslan hediye test butonları
-- Hediye olayına göre slime rengi, boncuk, sim ve ekrandaki etkinlik akışı değişir
-- Mobil ekrana uyumlu arayüz
+1. Install Node.js 20 or newer.
+2. Open a terminal in this folder.
+3. Run `npm install`.
+4. Set your TikTok LIVE username (without @):
+   - macOS/Linux: `TIKTOK_USERNAME=your_username npm start`
+   - Windows PowerShell: `$env:TIKTOK_USERNAME="your_username"; npm start`
+5. Open `http://localhost:3001` in OBS as a Browser Source (1080 × 1920).
 
-## Henüz dahil değil
-- Recep İvedik'e özel, film kalitesinde kişiselleştirilmiş karakter modeli
-- Gerçek TikTok LIVE hediye olaylarını alan güvenli backend
-- Tam fizik tabanlı sıvı/slime simülasyonu
-- OBS'ye özel yayın sahnesi ve otomatik 9:16 yayın çıkışı
+Without TIKTOK_USERNAME, the scene still starts and test gifts can be sent from:
+`POST http://localhost:3001/test-gift` with JSON `{"kind":"rose","username":"Mehmet"}`.
 
-Bu nedenle bu dosya, görsel/etkileşim prototipidir; gerçek LIVE entegrasyonu değildir. Harici Three.js modülü için internet bağlantısı gerekir.
+## Gift mapping
+- Rose / Gül → water
+- Heart / Kalp → pink dye
+- Flower / Çiçek → beads
+- Diamond / Elmas → glitter
+- Lion / Aslan → mega glitter
+
+Unknown gifts are displayed as a celebration only; they do not trigger a large animation.
+
+## Important limitations
+- TikTok LIVE Connector is an unofficial community integration, not an official TikTok API. Availability and compatibility can change.
+- This bridge does not request or store TikTok passwords, cookies, or session tokens.
+- GitHub Pages can host the static preview, but it cannot run this Node.js bridge. Real LIVE events require this server to run on a PC/VPS reachable by the browser scene.
+- The current 3D host is still a temporary placeholder. A custom, rigged character model and full deformable slime physics are separate production tasks and require visual references plus a capable PC/GPU.
