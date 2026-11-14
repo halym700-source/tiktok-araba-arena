@@ -23,11 +23,16 @@ let liveConnection = null;
 let liveStatus = "idle";
 
 const GIFT_RULES = {
-  rose: { kind: "rose", action: "water", label: "Su ekle" },
-  heart: { kind: "heart", action: "pink_dye", label: "Pembe boya ekle" },
-  flower: { kind: "flower", action: "beads", label: "Renkli boncuk serp" },
-  diamond: { kind: "diamond", action: "glitter", label: "Sim serp" },
-  lion: { kind: "lion", action: "mega_glitter", label: "Büyük sim paketi" }
+  rose: { kind: "water", action: "water", label: "Su dök" },
+  water: { kind: "water", action: "water", label: "Su dök" },
+  borax: { kind: "borax", action: "borax", label: "Boraks ekle" },
+  foam: { kind: "foam", action: "foam", label: "Köpüğü büyüt" },
+  color: { kind: "color", action: "color", label: "Rastgele renk ekle" },
+  tea: { kind: "tea", action: "tea", label: "Çaydanlıktan çay dök" },
+  finger: { kind: "finger", action: "finger", label: "Parmak kalp tepkisi" },
+  perfume: { kind: "perfume", action: "perfume", label: "Köpük artırıcı ekle" },
+  handheart: { kind: "handheart", action: "handheart", label: "Rastgele renk şarkısı" },
+  work: { kind: "work", action: "work", label: "Tepsiyi yana yatır" }
 };
 
 function broadcast(payload) {
@@ -38,16 +43,18 @@ function broadcast(payload) {
 }
 
 function normalizeGift(data) {
-  const giftName = String(data.giftName || data.giftDetails?.giftName || "").toLowerCase();
+  const giftName = String(data.giftName || data.giftDetails?.giftName || "").toLocaleLowerCase("tr-TR");
   let rule = null;
-  if (giftName.includes("rose") || giftName.includes("gül")) rule = GIFT_RULES.rose;
-  else if (giftName.includes("heart") || giftName.includes("kalp")) rule = GIFT_RULES.heart;
-  else if (giftName.includes("flower") || giftName.includes("çiçek")) rule = GIFT_RULES.flower;
-  else if (giftName.includes("diamond") || giftName.includes("elmas")) rule = GIFT_RULES.diamond;
-  else if (giftName.includes("lion") || giftName.includes("aslan")) rule = GIFT_RULES.lion;
+  if (giftName.includes("borax") || giftName.includes("boraks")) rule = GIFT_RULES.borax;
+  else if (giftName.includes("foam") || giftName.includes("köpük")) rule = GIFT_RULES.foam;
+  else if (giftName.includes("color") || giftName.includes("renk")) rule = GIFT_RULES.color;
+  else if (giftName.includes("water") || giftName.includes("su") || giftName.includes("rose") || giftName.includes("gül")) rule = GIFT_RULES.water;
+  else if (giftName.includes("tea") || giftName.includes("çay")) rule = GIFT_RULES.tea;
+  else if (giftName.includes("finger") || giftName.includes("parmak")) rule = GIFT_RULES.finger;
+  else if (giftName.includes("perfume") || giftName.includes("parfüm")) rule = GIFT_RULES.perfume;
+  else if (giftName.includes("hand heart") || giftName.includes("elle kalp") || giftName.includes("el kalp")) rule = GIFT_RULES.handheart;
+  else if (giftName.includes("work") || giftName.includes("iş gücü") || giftName.includes("işgücü")) rule = GIFT_RULES.work;
 
-  // Fallback by gift value: unknown gifts still create a visible event without
-  // silently triggering a costly/large animation.
   const user = data.user || {};
   return {
     type: "gift",
