@@ -122,7 +122,7 @@ async function connectTikTok() {
   }
 }
 
-server.listen(PORT, "0.0.0.0", () => {
+server.listen(PORT, "127.0.0.1", () => {
   console.log(`Slime Live hazır: http://localhost:${PORT}`);
   connectTikTok();
 });
