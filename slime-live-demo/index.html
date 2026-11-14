@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Slime Live — 3D Hediye Arenası</title>
+<style>
+:root{--bg:#090b1c;--panel:#12162c;--mint:#8cf5d0;--purple:#b78cff;--pink:#ff8fcf}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#29204c 0%,#0b0d20 55%,#070814 100%);color:#f8f4ff;font-family:Inter,system-ui,Arial;min-height:100vh}
+header{padding:18px 20px 10px;display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:auto}
+.brand{font-weight:900;letter-spacing:.12em;font-size:14px}.brand span{color:var(--mint)}.live{font-size:11px;color:#ff9cba;border:1px solid #7d365d;border-radius:20px;padding:7px 11px;background:#42152b66}
+main{max-width:1100px;margin:auto;padding:10px 18px 30px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.8fr);gap:16px}
+.stage{position:relative;min-height:650px;border:1px solid #ffffff1b;border-radius:25px;overflow:hidden;background:linear-gradient(160deg,#1c2145,#17132f 50%,#10152a);box-shadow:0 24px 80px #0008}
+#scene{position:absolute;inset:0;width:100%;height:100%}.overlay{position:absolute;z-index:2;pointer-events:none}.topline{top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center}.pill{background:#090b1dcc;border:1px solid #ffffff20;padding:8px 11px;border-radius:30px;font-size:11px;backdrop-filter:blur(12px)}.viewers{color:var(--mint)}
+.caption{bottom:18px;left:16px;right:16px;text-align:center;font-size:13px;text-shadow:0 2px 12px #000;font-weight:700}
+.side{display:flex;flex-direction:column;gap:14px}.card{border:1px solid #ffffff19;background:linear-gradient(145deg,#191d39dd,#111429ee);border-radius:20px;padding:17px;box-shadow:0 14px 40px #0003}.card h2{font-size:13px;letter-spacing:.12em;margin:0 0 12px;color:#c9c3e7}.status{font-size:12px;color:#a8a6c5;line-height:1.55}.giftgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.gift{border:1px solid #ffffff1c;border-radius:14px;background:#ffffff08;color:#fff;padding:12px 8px;cursor:pointer;text-align:left;transition:.18s}.gift:active{transform:scale(.96);background:#ffffff20}.gift b{display:block;font-size:21px;margin-bottom:4px}.gift span{font-size:11px;color:#d3cce9}.gift small{display:block;color:#8f8ba9;margin-top:3px}.feed{display:flex;flex-direction:column;gap:8px;min-height:90px}.event{font-size:11px;padding:8px 10px;border-radius:10px;background:#ffffff0a;color:#ded9f2;border-left:2px solid var(--mint)}.event strong{color:var(--mint)}.meter{height:7px;border-radius:20px;background:#ffffff12;overflow:hidden;margin-top:10px}.meter i{display:block;height:100%;width:35%;background:linear-gradient(90deg,var(--purple),var(--mint));border-radius:20px;transition:width .4s}
+.note{font-size:10px;color:#8885a7;line-height:1.5;margin-top:12px}.reset{width:100%;border:1px solid #ffffff24;background:#ffffff0c;color:#ddd6f3;padding:11px;border-radius:12px;margin-top:10px;cursor:pointer}
+footer{max-width:1100px;margin:auto;padding:0 18px 25px;color:#77748f;font-size:10px}
+@media(max-width:760px){main{grid-template-columns:1fr;padding:8px 10px 20px}.stage{min-height:560px}.side{display:grid;grid-template-columns:1fr 1fr}.side .card:first-child{grid-column:1/-1}header{padding:14px 13px}.feed{min-height:60px}}
+</style>
+</head>
+<body>
+<header><div class="brand">SLIME <span>LIVE</span> / 3D GIFT LAB</div><div class="live">● DEMO LIVE</div></header>
+<main>
+<section class="stage"><canvas id="scene"></canvas><div class="overlay topline"><div class="pill">🫧 GALAXY SLIME LAB</div><div class="pill viewers">◉ <span id="viewerCount">128</span> izleyici</div></div><div class="overlay caption" id="caption">Bir hediye gönder, slime'a birlikte şekil verelim!</div></section>
+<aside class="side">
+<div class="card"><h2>HEDİYE GÖNDER / TEST ET</h2><div class="status">TikTok LIVE bağlantısı olmadan hediye olaylarını burada deneyebilirsin. Her hediye karaktere farklı bir hareket yaptırır.</div><div class="giftgrid" style="margin-top:13px">
+<button class="gift" data-kind="rose"><b>🌹</b><span>Gül</span><small>Su ekle</small></button>
+<button class="gift" data-kind="heart"><b>💗</b><span>Kalp</span><small>Pembe boya</small></button>
+<button class="gift" data-kind="flower"><b>🌼</b><span>Çiçek</span><small>Renkli boncuk</small></button>
+<button class="gift" data-kind="diamond"><b>💎</b><span>Elmas</span><small>Sim serp</small></button>
+<button class="gift" data-kind="lion" style="grid-column:1/-1"><b>🦁</b><span>Aslan</span><small>Büyük sim paketi + özel tepki</small></button>
+</div></div>
+<div class="card"><h2>CANLI HEDİYE AKIŞI</h2><div class="feed" id="feed"><div class="event">Sistem hazır. İlk hediyeyi bekliyor…</div></div><div class="note">Demo modunda kullanıcı adı örnek olarak gösterilir.</div></div>
+<div class="card"><h2>SLIME DURUMU</h2><div class="status">Parıltı seviyesi <b id="sparkText">%18</b><div class="meter"><i id="sparkMeter"></i></div><br>Renk: <b id="colorText">Galaksi moru + nane</b><br>Karakter: <b>3D animasyon prototipi</b></div><button class="reset" id="reset">↺ Slime'ı sıfırla</button><div class="note">Bu ilk teknik prototiptir. Film kalitesinde özel karakter modeli ve gerçek TikTok LIVE sunucu bağlantısı henüz eklenmedi.</div></div>
+</aside>
+</main>
+<footer>SLIME LIVE — Etkileşim prototipi · OBS için 9:16 sahneye dönüştürülebilir · TikTok hediye entegrasyonu sonraki aşamadır.</footer>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+const canvas=document.querySelector('#scene');const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(canvas.clientWidth,canvas.clientHeight,false);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x17152f,10,24);const camera=new THREE.PerspectiveCamera(34,1,.1,100);camera.position.set(0,4.2,11.8);camera.lookAt(0,2.2,0);
+scene.add(new THREE.HemisphereLight(0xc8d8ff,0x302044,2));const key=new THREE.DirectionalLight(0xffe5d5,3.2);key.position.set(-4,8,6);key.castShadow=true;scene.add(key);const rim=new THREE.PointLight(0x9b77ff,45,12);rim.position.set(4,4,1);scene.add(rim);const mintLight=new THREE.PointLight(0x69ffd4,25,10);mintLight.position.set(-4,2,2);scene.add(mintLight);
+const mat=(color,rough=.45,metal=0)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
+const floor=new THREE.Mesh(new THREE.CircleGeometry(8,64),mat(0x171a35,.8));floor.rotation.x=-Math.PI/2;floor.position.y=-.05;floor.receiveShadow=true;scene.add(floor);
+const platform=new THREE.Mesh(new THREE.CylinderGeometry(3.25,3.45,.28,64),mat(0x26234b,.3,.35));platform.position.set(0,.1,0);platform.castShadow=true;platform.receiveShadow=true;scene.add(platform);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(3.12,.035,12,100),new THREE.MeshStandardMaterial({color:0x8cf5d0,emissive:0x276e63,emissiveIntensity:1.5,metalness:.6}));ring.rotation.x=Math.PI/2;ring.position.y=.26;scene.add(ring);
+// table
+const tableTop=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.5,.18,64),mat(0x40396a,.28,.4));tableTop.position.set(0,1.12,0);tableTop.castShadow=true;scene.add(tableTop);
+const leg=new THREE.Mesh(new THREE.CylinderGeometry(.16,.24,1.05,24),mat(0x6b5a91,.3,.5));leg.position.set(0,.58,0);scene.add(leg);
+// slime dish and glossy blob
+const bowl=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.45,.34,64,1,true),new THREE.MeshPhysicalMaterial({color:0x8edfcf,transparent:true,opacity:.42,roughness:.12,metalness:.15,side:THREE.DoubleSide,clearcoat:1}));bowl.position.set(0,1.38,0);scene.add(bowl);
+const blobGeo=new THREE.SphereGeometry(1.28,64,48);const base=blobGeo.attributes.position.array.slice();const slimeMat=new THREE.MeshPhysicalMaterial({color:0x9e72e8,roughness:.16,metalness:.08,clearcoat:1,clearcoatRoughness:.06,iridescence:.7,iridescenceIOR:1.5});const slime=new THREE.Mesh(blobGeo,slimeMat);slime.scale.set(1.12,.44,1.12);slime.position.set(0,1.63,0);slime.castShadow=true;scene.add(slime);
+const beadMat=[0x86f6d1,0xff8fcf,0xffd66e,0x9d9cff].map(c=>new THREE.MeshPhysicalMaterial({color:c,roughness:.18,metalness:.1,clearcoat:1}));const beads=[];
+for(let i=0;i<38;i++){const b=new THREE.Mesh(new THREE.SphereGeometry(.045+Math.random()*.035,12,10),beadMat[i%4]);const a=Math.random()*Math.PI*2,r=.25+Math.random()*.95;b.position.set(Math.cos(a)*r,1.86+Math.random()*.05,Math.sin(a)*r);b.visible=false;scene.add(b);beads.push(b)}
+// stylized comedic host, original generic character placeholder
+const skin=mat(0xd69a72,.72),shirt=mat(0x376d83,.65),pants=mat(0x282b45,.8),hair=mat(0x211a1b,.9),white=mat(0xf3e8dc,.4),black=mat(0x211923,.35);
+const host=new THREE.Group();host.position.set(0,0,3.05);scene.add(host);
+function ell(parent,m,x,y,z,sx,sy,sz){const o=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;parent.add(o);return o}
+function limb(parent,a,b,r1,r2,m){const d=new THREE.Vector3(...b).sub(new THREE.Vector3(...a));const o=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,d.length(),20),m);o.position.copy(new THREE.Vector3(...a).add(new THREE.Vector3(...b)).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());o.castShadow=true;parent.add(o);return o}
+ell(host,pants,-.36,.72,0,.22,.72,.24);ell(host,pants,.36,.72,0,.22,.72,.24);ell(host,shirt,0,1.8,0,.78,.88,.43);ell(host,skin,0,2.92,.02,.55,.66,.48);ell(host,hair,0,3.42,-.02,.57,.28,.49);ell(host,hair,-.49,3.03,.04,.12,.35,.38);ell(host,hair,.49,3.03,.04,.12,.35,.38);
+ell(host,white,-.2,3.02,.45,.13,.105,.06);ell(host,white,.2,3.02,.45,.13,.105,.06);ell(host,black,-.19,3.02,.505,.052,.065,.025);ell(host,black,.21,3.02,.505,.052,.065,.025);ell(host,hair,0,2.81,.48,.25,.085,.07);ell(host,skin,0,2.91,.49,.105,.16,.1);
+const moustache=ell(host,hair,0,2.69,.49,.3,.09,.09);ell(host,skin,0,2.52,.44,.22,.08,.08);
+limb(host,[-.62,2.2,0],[-1.15,1.85,.35],.16,.12,shirt);limb(host,[-1.15,1.85,.35],[-1.02,1.5,.68],.12,.09,skin);limb(host,[.62,2.2,0],[1.12,2.55,.3],.16,.12,shirt);const rightArm=limb(host,[1.12,2.55,.3],[1.02,2.95,.58],.12,.09,skin);ell(host,skin,1.02,2.98,.61,.16,.13,.14);
+// little apron badge
+const badge=ell(host,mat(0xe7c978,.25,.5),-.35,1.95,.405,.13,.1,.035);
+// simple jar held near raised hand
+const jar=new THREE.Group();const jarBody=new THREE.Mesh(new THREE.CylinderGeometry(.12,.14,.36,24),new THREE.MeshPhysicalMaterial({color:0x9cebd8,transparent:true,opacity:.45,roughness:.1,metalness:.1}));jar.add(jarBody);const lid=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,.055,24),mat(0xe9b5ff,.25,.6));lid.position.y=.21;jar.add(lid);jar.position.set(1.03,3.15,.6);jar.rotation.z=-.4;host.add(jar);
+const dust=[];for(let i=0;i<80;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(.018+Math.random()*.018,8,8),new THREE.MeshBasicMaterial({color:i%2?0xa8ffe4:0xd2a5ff,transparent:true,opacity:.7}));p.position.set((Math.random()-.5)*8,Math.random()*6,(Math.random()-.5)*5);scene.add(p);dust.push(p)}
+let action=0,spark=18,beat=0;const caption=document.querySelector('#caption');
+function gift(kind){action++;const map={rose:['🌹 Mehmet','Bir gül geldi! Su ekliyorum.'],heart:['💗 Ayşe','Pembe renk slime’a karışıyor!'],flower:['🌼 Zeynep','Renkli boncukları serpiyorum!'],diamond:['💎 Eren','Işıltılı sim zamanı!'],lion:['🦁 Mert','Vay be! Kocaman sim paketi geliyor!']};const [who,msg]=map[kind];caption.textContent=msg;const feed=document.querySelector('#feed');const ev=document.createElement('div');ev.className='event';ev.innerHTML='<strong>'+who+'</strong> · '+msg;feed.prepend(ev);while(feed.children.length>4)feed.lastChild.remove();
+if(kind==='flower'){beads.forEach((b,i)=>{if(i<18+action%12)b.visible=true})}if(kind==='diamond'||kind==='lion'){spark=Math.min(100,spark+(kind==='lion'?35:14));document.querySelector('#sparkText').textContent='%'+spark;document.querySelector('#sparkMeter').style.width=spark+'%'}if(kind==='heart'){slimeMat.color.set(0xe77bb7);document.querySelector('#colorText').textContent='Galaksi pembe + nane'}if(kind==='rose'){slimeMat.color.set(0x9e72e8)}beat=1;host.rotation.y=.18;jar.visible=true;setTimeout(()=>{host.rotation.y=0},900)}
+document.querySelectorAll('.gift').forEach(b=>b.addEventListener('click',()=>gift(b.dataset.kind)));document.querySelector('#reset').addEventListener('click',()=>{spark=18;document.querySelector('#sparkText').textContent='%18';document.querySelector('#sparkMeter').style.width='18%';document.querySelector('#colorText').textContent='Galaksi moru + nane';slimeMat.color.set(0x9e72e8);beads.forEach(b=>b.visible=false);caption.textContent='Slime sıfırlandı. Yeni hediyeyi bekliyoruz!';document.querySelector('#feed').innerHTML='<div class="event">Slime sıfırlandı. Sistem hazır.</div>'});
+const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();slime.position.y=1.63+Math.sin(t*1.8)*.035;slime.scale.y=.44+Math.sin(t*2.4)*.025;const pos=blobGeo.attributes.position;for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],z=base[i*3+2];const wave=Math.sin(x*4+t*2)*Math.cos(z*3+t*1.5)*.025;pos.setY(i,y+wave)}pos.needsUpdate=true;blobGeo.computeVertexNormals();host.position.y=Math.sin(t*1.5)*.025;host.rotation.z=Math.sin(t*.9)*.012;dust.forEach((p,i)=>{p.position.y+=.002+(i%3)*.0004;if(p.position.y>6)p.position.y=0});renderer.render(scene,camera)}
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}new ResizeObserver(resize).observe(canvas);animate();
+</script>
+</body></html>
