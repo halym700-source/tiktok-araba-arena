@@ -19,7 +19,7 @@ footer{max-width:1100px;margin:auto;padding:0 18px 25px;color:#77748f;font-size:
 </style>
 </head>
 <body>
-<header><div class="brand">SLIME <span>LIVE</span> / 3D GIFT LAB</div><div class="live">● DEMO LIVE</div></header>
+<header><div class="brand">SLIME <span>LIVE</span> / 3D GIFT LAB</div><div class="live" id="liveStatus">● KÖPRÜ BEKLENİYOR</div></header>
 <main>
 <section class="stage"><canvas id="scene"></canvas><div class="overlay topline"><div class="pill">🫧 GALAXY SLIME LAB</div><div class="pill viewers">◉ <span id="viewerCount">128</span> izleyici</div></div><div class="overlay caption" id="caption">Bir hediye gönder, slime'a birlikte şekil verelim!</div></section>
 <aside class="side">
@@ -68,8 +68,27 @@ const badge=ell(host,mat(0xe7c978,.25,.5),-.35,1.95,.405,.13,.1,.035);
 const jar=new THREE.Group();const jarBody=new THREE.Mesh(new THREE.CylinderGeometry(.12,.14,.36,24),new THREE.MeshPhysicalMaterial({color:0x9cebd8,transparent:true,opacity:.45,roughness:.1,metalness:.1}));jar.add(jarBody);const lid=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,.055,24),mat(0xe9b5ff,.25,.6));lid.position.y=.21;jar.add(lid);jar.position.set(1.03,3.15,.6);jar.rotation.z=-.4;host.add(jar);
 const dust=[];for(let i=0;i<80;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(.018+Math.random()*.018,8,8),new THREE.MeshBasicMaterial({color:i%2?0xa8ffe4:0xd2a5ff,transparent:true,opacity:.7}));p.position.set((Math.random()-.5)*8,Math.random()*6,(Math.random()-.5)*5);scene.add(p);dust.push(p)}
 let action=0,spark=18,beat=0;const caption=document.querySelector('#caption');
-function gift(kind){action++;const map={rose:['🌹 Mehmet','Bir gül geldi! Su ekliyorum.'],heart:['💗 Ayşe','Pembe renk slime’a karışıyor!'],flower:['🌼 Zeynep','Renkli boncukları serpiyorum!'],diamond:['💎 Eren','Işıltılı sim zamanı!'],lion:['🦁 Mert','Vay be! Kocaman sim paketi geliyor!']};const [who,msg]=map[kind];caption.textContent=msg;const feed=document.querySelector('#feed');const ev=document.createElement('div');ev.className='event';ev.innerHTML='<strong>'+who+'</strong> · '+msg;feed.prepend(ev);while(feed.children.length>4)feed.lastChild.remove();
+function gift(kind, usernameOverride=''){action++;const map={rose:['🌹','Bir gül geldi! Su ekliyorum.'],heart:['💗','Pembe renk slime’a karışıyor!'],flower:['🌼','Renkli boncukları serpiyorum!'],diamond:['💎','Işıltılı sim zamanı!'],lion:['🦁','Vay be! Kocaman sim paketi geliyor!'],unknown:['🎁','Teşekkürler! Hediye geldi.']};const [emoji,msg]=map[kind]||map.unknown;const who=(usernameOverride||'Test_izleyici').replace(/[<>&"']/g,'');caption.textContent=msg;const feed=document.querySelector('#feed');const ev=document.createElement('div');ev.className='event';const strong=document.createElement('strong');strong.textContent=emoji+' '+who;ev.append(strong,document.createTextNode(' · '+msg));feed.prepend(ev);while(feed.children.length>4)feed.lastChild.remove();
 if(kind==='flower'){beads.forEach((b,i)=>{if(i<18+action%12)b.visible=true})}if(kind==='diamond'||kind==='lion'){spark=Math.min(100,spark+(kind==='lion'?35:14));document.querySelector('#sparkText').textContent='%'+spark;document.querySelector('#sparkMeter').style.width=spark+'%'}if(kind==='heart'){slimeMat.color.set(0xe77bb7);document.querySelector('#colorText').textContent='Galaksi pembe + nane'}if(kind==='rose'){slimeMat.color.set(0x9e72e8)}beat=1;host.rotation.y=.18;jar.visible=true;setTimeout(()=>{host.rotation.y=0},900)}
+// Local event bridge: when served by server.js, real LIVE gift events arrive here.
+const liveStatus=document.querySelector('#liveStatus');
+try {
+  const wsProtocol=location.protocol==='https:'?'wss:':'ws:';
+  const liveSocket=new WebSocket(wsProtocol+'//'+location.host+'/live');
+  liveSocket.addEventListener('open',()=>{liveStatus.textContent='● KÖPRÜ BAĞLANDI';});
+  liveSocket.addEventListener('close',()=>{liveStatus.textContent='● KÖPRÜ KAPALI';});
+  liveSocket.addEventListener('error',()=>{liveStatus.textContent='● BAĞLANTI HATASI';});
+  liveSocket.addEventListener('message',(event)=>{
+    let payload; try{payload=JSON.parse(event.data)}catch{return;}
+    if(payload.type==='status'){
+      liveStatus.textContent=payload.status==='connected'?'● TIKTOK LIVE BAĞLI':('● '+String(payload.status||'DURUM').toUpperCase());
+    }
+    if(payload.type==='gift'){
+      if(payload.kind==='unknown'){gift('unknown',payload.username);}
+      else {gift(payload.kind,payload.username);}
+    }
+  });
+} catch (error) { liveStatus.textContent='● DEMO MODU'; }
 document.querySelectorAll('.gift').forEach(b=>b.addEventListener('click',()=>gift(b.dataset.kind)));document.querySelector('#reset').addEventListener('click',()=>{spark=18;document.querySelector('#sparkText').textContent='%18';document.querySelector('#sparkMeter').style.width='18%';document.querySelector('#colorText').textContent='Galaksi moru + nane';slimeMat.color.set(0x9e72e8);beads.forEach(b=>b.visible=false);caption.textContent='Slime sıfırlandı. Yeni hediyeyi bekliyoruz!';document.querySelector('#feed').innerHTML='<div class="event">Slime sıfırlandı. Sistem hazır.</div>'});
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();slime.position.y=1.63+Math.sin(t*1.8)*.035;slime.scale.y=.44+Math.sin(t*2.4)*.025;const pos=blobGeo.attributes.position;for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],z=base[i*3+2];const wave=Math.sin(x*4+t*2)*Math.cos(z*3+t*1.5)*.025;pos.setY(i,y+wave)}pos.needsUpdate=true;blobGeo.computeVertexNormals();host.position.y=Math.sin(t*1.5)*.025;host.rotation.z=Math.sin(t*.9)*.012;dust.forEach((p,i)=>{p.position.y+=.002+(i%3)*.0004;if(p.position.y>6)p.position.y=0});renderer.render(scene,camera)}
 function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}new ResizeObserver(resize).observe(canvas);animate();
