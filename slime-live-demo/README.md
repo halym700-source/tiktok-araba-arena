@@ -41,3 +41,10 @@ Without TIKTOK_USERNAME, the scene starts in test mode. Test a gift using:
 - A real, high-quality custom 3D character with facial rigging, hand animation and reliable lip sync is not yet included. The current host is a procedural placeholder.
 - For a public LIVE, verify the local bridge, OBS capture, sound levels, moderation and gift-name mapping in a private test first.
 - Do not present borax or any other chemical as safe to ingest or use on skin; keep materials away from viewers and children.
+
+## YouTube song requests
+- Viewers can request a song in TikTok chat with `!şarkı https://www.youtube.com/watch?v=VIDEO_ID` (also accepts `!sarki`).
+- Requests are added to a queue in the scene; the streamer must click **Onayla ve çal**. Requests are not played automatically.
+- The scene uses the YouTube IFrame Player API and displays a compact player on the vertical stage. The first playback may require a direct click because browsers restrict autoplay.
+- Only standard YouTube video links, youtu.be links, Shorts and embed URLs with a valid 11-character video ID are accepted. Queue is limited to 10 pending requests and duplicate video IDs are ignored.
+- Playback depends on YouTube embedding availability, region/age restrictions, the streamer's browser/network, and applicable music copyright/licensing rules. A YouTube link is not permission to rebroadcast copyrighted music.
