@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slime LIVE - Gizli Müzik Kumandası</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#29204c,#090b1c 70%);color:#f8f4ff;font:15px system-ui,Arial;display:grid;place-items:center;padding:20px}.panel{width:min(100%,620px);background:#14182f;border:1px solid #ffffff22;border-radius:22px;padding:24px;box-shadow:0 20px 70px #0008}h1{font-size:20px;margin:0 0 8px}.sub,.hint{color:#aaa6c8;font-size:13px;line-height:1.5}input{width:100%;margin:18px 0 12px;padding:14px;border:1px solid #ffffff30;border-radius:12px;background:#090d20;color:white;font-size:15px}button{border:1px solid #ffffff28;border-radius:12px;padding:12px 16px;background:#29234b;color:white;font-weight:700;cursor:pointer;margin:4px}button.primary{background:#246d60}.controls{display:flex;flex-wrap:wrap;gap:6px}#player{width:100%;aspect-ratio:16/9;margin-top:16px;background:#05060d;border-radius:12px;overflow:hidden}#player iframe{width:100%;height:100%;border:0}.status{margin-top:12px;color:#8cf5d0;font-size:13px;min-height:20px}label{display:block;margin-top:14px;color:#d7d2e9;font-size:13px}input[type=range]{padding:0;margin:8px 0;accent-color:#8cf5d0}.hint{margin-top:16px}
+</style>
+</head>
+<body>
+<section class="panel">
+<h1>🎵 Slime LIVE — Gizli Müzik Kumandası</h1>
+<div class="sub">YouTube bağlantısını buraya yapıştır. Bu pencere ayrı kalır; Slime sahnesine müzik arayüzü eklenmez.</div>
+<input id="url" type="url" placeholder="YouTube şarkı bağlantısını yapıştır">
+<div class="controls"><button class="primary" id="play">▶ Şarkıyı çal</button><button id="pause">⏸ Duraklat</button><button id="stop">■ Durdur</button></div>
+<label for="volume">Ses seviyesi</label>
+<input id="volume" type="range" min="0" max="100" value="65">
+<div id="player"></div>
+<div class="status" id="status">Bir YouTube bağlantısı bekleniyor.</div>
+<div class="hint">Yayın için: TikTok LIVE Studio'da masaüstü/sistem sesini etkinleştir. Bu kontrol penceresini yayın görüntüsü olarak ekleme; yalnızca sesini yayına aktar. İlk oynatmayı bu penceredeki düğmeye basarak başlat. Bazı videolar gömülü oynatmaya kapalı olabilir.</div>
+</section>
+<script>
+let player=null,apiReady=false,queuedId=null;
+const statusEl=document.getElementById('status');
+function setStatus(t){statusEl.textContent=t}
+function getVideoId(raw){try{const u=new URL(raw);let id='';if(u.hostname==='youtu.be')id=u.pathname.slice(1);else if(u.hostname.includes('youtube.com'))id=u.searchParams.get('v')||((u.pathname.match(/\/(?:shorts|embed|live)\/([^/?]+)/)||[])[1]||'');return /^[a-zA-Z0-9_-]{11}$/.test(id)?id:null}catch(e){return null}}
+window.onYouTubeIframeAPIReady=()=>{apiReady=true;if(queuedId)loadVideo(queuedId)};
+function loadVideo(id){if(!apiReady){queuedId=id;setStatus('YouTube oynatıcısı hazırlanıyor…');return}if(!player){player=new YT.Player('player',{videoId:id,width:'100%',height:'100%',playerVars:{autoplay:1,controls:1,rel:0,playsinline:1},events:{onReady:e=>{e.target.setVolume(+document.getElementById('volume').value);e.target.playVideo()},onStateChange:e=>{if(e.data===1)setStatus('Şarkı çalıyor.');else if(e.data===2)setStatus('Şarkı duraklatıldı.');else if(e.data===0)setStatus('Şarkı bitti.')},onError:e=>setStatus('Bu video gömülü oynatılamıyor (YouTube hata '+e.data+'). Başka bir bağlantı dene.')}})}else{player.loadVideoById(id);player.setVolume(+document.getElementById('volume').value);player.playVideo()}}
+document.getElementById('play').onclick=()=>{const id=getVideoId(document.getElementById('url').value.trim());if(!id){setStatus('Geçerli bir YouTube video bağlantısı yapıştır.');return}loadVideo(id)};
+document.getElementById('pause').onclick=()=>{if(player)player.pauseVideo()};
+document.getElementById('stop').onclick=()=>{if(player)player.stopVideo()};
+document.getElementById('volume').oninput=e=>{if(player)player.setVolume(+e.target.value)};
+const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
+</script>
+</body>
+</html>
