@@ -14,7 +14,7 @@ try {
       if ([string]::IsNullOrWhiteSpace($requestLine)) { $client.Close(); continue }
       while (($header = $reader.ReadLine()) -ne $null -and $header -ne "") {}
       $parts = $requestLine.Split(" ")
-      $urlPath = [Uri]::UnescapeDataString(($parts[1] -split "\?")[0])
+      $urlPath = [Uri]::UnescapeDataString(($parts[1] -split '\?')[0])
       if ($urlPath -eq "/") { $urlPath = "/index.html" }
       $relative = $urlPath.TrimStart('/') -replace '/', [System.IO.Path]::DirectorySeparatorChar
       $file = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($root, $relative))
