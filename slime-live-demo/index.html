@@ -120,7 +120,25 @@ const jar=new THREE.Group();const jarBody=new THREE.Mesh(new THREE.CylinderGeome
 const kettle=new THREE.Group();const kettleBody=new THREE.Mesh(new THREE.SphereGeometry(.23,24,18),new THREE.MeshPhysicalMaterial({color:0x9d9da9,metalness:.8,roughness:.22}));kettle.add(kettleBody);const spout=new THREE.Mesh(new THREE.ConeGeometry(.09,.28,20),kettleBody.material);spout.position.set(.24,.08,0);spout.rotation.z=-1.1;kettle.add(spout);const handle=new THREE.Mesh(new THREE.TorusGeometry(.17,.035,10,24),kettleBody.material);handle.position.set(-.22,.05,0);kettle.add(handle);kettle.position.set(-1.5,2.45,.3);kettle.visible=false;scene.add(kettle);
 const dust=[];for(let i=0;i<80;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(.018+Math.random()*.018,8,8),new THREE.MeshBasicMaterial({color:i%2?0xa8ffe4:0xd2a5ff,transparent:true,opacity:.7}));p.position.set((Math.random()-.5)*8,Math.random()*6,(Math.random()-.5)*5);scene.add(p);dust.push(p)}
 let action=0,spark=18,beat=0,foam=1,tilt=0,waterLevel=0,teaTint=0;const caption=document.querySelector('#caption');
-function speak(line){caption.textContent=line;if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(line);u.lang='tr-TR';u.rate=.94;u.pitch=1.03;speechSynthesis.speak(u)}}
+function speak(line){
+ caption.textContent=line;
+ if(!('speechSynthesis' in window))return;
+ speechSynthesis.cancel();
+ // Natural, expressive Turkish male-presenting delivery. The exact voice depends on
+ // the voices installed in the viewer's browser/device; this does not clone an actor.
+ const makeUtterance=()=>{
+  const u=new SpeechSynthesisUtterance(line);
+  u.lang='tr-TR';u.rate=.88;u.pitch=.84;u.volume=1;
+  const voices=speechSynthesis.getVoices();
+  const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang));
+  const preferred=tr.find(v=>/male|erkek|kaan|ahmet|mehmet|burak|cem/i.test(v.name));
+  if(preferred)u.voice=preferred;
+  u.onboundary=(e)=>{if(e.name==='word'){}};
+  speechSynthesis.speak(u);
+ };
+ if(speechSynthesis.getVoices().length)makeUtterance();
+ else {speechSynthesis.addEventListener('voiceschanged',makeUtterance,{once:true});setTimeout(()=>{if(speechSynthesis.speaking||speechSynthesis.pending)return;makeUtterance()},350);}
+}
 function gift(kind, usernameOverride='', repeatCount=1){action++;const map={water:['💧','Su geldi!'],borax:['🧪','Boraks ekliyorum.'],foam:['🫧','Köpüğü şişiriyorum!'],color:['🎨','Renkleri karıştırıyorum!'],tea:['🫖','Çaydanlığı alıyorum!'],finger:['🫰','Bak bu adamdan kalpten oynuyor!'],perfume:['🧴','İşte bu şimdi bu gocaman olur gardaş!'],handheart:['🫶','Renklensin slimemızıııız!'],work:['💪','Ooo, tepsiyi yana alıyorum!'],unknown:['🎁','Teşekkürler! Hediye geldi.']};const [emoji,msg]=map[kind]||map.unknown;const who=(usernameOverride||'Test_izleyici').replace(/[<>&"']/g,'');caption.textContent=msg;const feed=document.querySelector('#feed');const ev=document.createElement('div');ev.className='event';const strong=document.createElement('strong');strong.textContent=emoji+' '+who;ev.append(strong,document.createTextNode(' · '+msg));feed.prepend(ev);while(feed.children.length>4)feed.lastChild.remove();
 const consistency=document.querySelector('#consistencyText');
 if(kind==='water'){waterLevel=Math.min(1,waterLevel+.12*repeatCount);slime.scale.y=Math.max(.22,slime.scale.y-.035*repeatCount);consistency.textContent='Daha akışkan';if(repeatCount>=20&&repeatCount<=30)speak('Gardaş yapma gözünü yağını yiyim bak ninem ikimizi de yer ha, bura kuyuya döndü!');else if(repeatCount>=6&&repeatCount<=10)speak('Gardaş bak bu iş iyiye gitmiyor ha!');else if(repeatCount>=1&&repeatCount<=5)speak('La gardaş şu ekleme la!');}
