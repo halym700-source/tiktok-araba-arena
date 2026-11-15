@@ -131,8 +131,9 @@ function speak(line){
   u.lang='tr-TR';u.rate=.88;u.pitch=.84;u.volume=1;
   const voices=speechSynthesis.getVoices();
   const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang));
-  const preferred=tr.find(v=>/male|erkek|kaan|ahmet|mehmet|burak|cem/i.test(v.name));
+  const preferred=tr.find(v=>/male|erkek|tolga|ahmet|mehmet|burak|cem|kaan/i.test(v.name));
   if(preferred)u.voice=preferred;
+  else if(tr.length)u.voice=tr[0];
   u.onboundary=(e)=>{if(e.name==='word'){}};
   speechSynthesis.speak(u);
  };
