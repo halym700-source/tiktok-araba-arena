@@ -75,7 +75,7 @@ const beadMat=[0x86f6d1,0xff8fcf,0xffd66e,0x9d9cff].map(c=>new THREE.MeshPhysica
 for(let i=0;i<38;i++){const b=new THREE.Mesh(new THREE.SphereGeometry(.045+Math.random()*.035,12,10),beadMat[i%4]);const aa=Math.random()*Math.PI*2,r=.25+Math.random()*.95;b.position.set(Math.cos(aa)*r,1.57,2.10+Math.sin(aa)*r*.72);b.visible=false;scene.add(b);beads.push(b)}
 // Detailed procedural host: free Three.js geometry, no paid model asset
 const skin=mat(0xd99b76,.72),shirt=mat(0xd96520,.62),pants=mat(0x25283d,.8),hair=mat(0x21191a,.92),beard=mat(0x342526,.9),white=mat(0xf6eee5,.36),black=mat(0x211923,.3),lip=mat(0x8d5148,.65);
-const host=new THREE.Group();host.position.set(0,0,-0.15);host.scale.set(1.22,1.22,1.22);scene.add(host);
+const host=new THREE.Group();host.position.set(0,0.04,0.42);host.scale.set(1.42,1.42,1.42);scene.add(host);
 function ell(parent,m,x,y,z,sx,sy,sz){const o=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
 function limb(parent,a,b,r1,r2,m){const d=new THREE.Vector3(...b).sub(new THREE.Vector3(...a));const o=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,d.length(),24),m);o.position.copy(new THREE.Vector3(...a).add(new THREE.Vector3(...b)).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());o.castShadow=true;parent.add(o);return o}
 function tube(parent,points,r,m){const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,28,r,10,false),m);mesh.castShadow=true;parent.add(mesh);return mesh}
