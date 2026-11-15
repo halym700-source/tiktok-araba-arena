@@ -151,24 +151,36 @@ if(kind==='tea'){teaTint=Math.min(1,teaTint+.16);slimeMat.color.lerp(new THREE.C
 if(kind==='finger')speak('Bak bu adamdan kalpten oynuyor!');
 if(kind==='work'){tilt=.65;tableTop.rotation.z=.65;trayGroup.rotation.z=.65;setTimeout(()=>{tableTop.rotation.z=0;trayGroup.rotation.z=0;tilt=0},1600);speak('Hele dur gardaş, tepsiyi yana akıtıyorum!');}
 beat=1;host.rotation.y=.18;jar.visible=true;jar.rotation.z=-.4;setTimeout(()=>{host.rotation.y=0},900)}
-// Local event bridge: when served by server.js, real LIVE gift events arrive here.
+// Direct browser connection to TikFinity Event API — no Node.js relay.
 const liveStatus=document.querySelector('#liveStatus');
+const normalizeGift=(name)=>{
+ const n=String(name||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').trim();
+ if(/borax|boraks/.test(n))return 'borax';
+ if(/foam|kopuk/.test(n))return 'foam';
+ if(/color|renk/.test(n))return 'color';
+ if(/water|su|rose|gul/.test(n))return 'water';
+ if(/tea|cay/.test(n))return 'tea';
+ if(/finger|parmak/.test(n))return 'finger';
+ if(/perfume|parfum/.test(n))return 'perfume';
+ if(/hand.?heart|elle.?kalp|el.?kalp/.test(n))return 'handheart';
+ if(/work|is.?gucu/.test(n))return 'work';
+ return 'unknown';
+};
 try {
-  const wsProtocol=location.protocol==='https:'?'wss:':'ws:';
-  const liveSocket=new WebSocket(wsProtocol+'//'+location.host+'/live');
-  liveSocket.addEventListener('open',()=>{liveStatus.textContent='● KÖPRÜ BAĞLANDI';});
-  liveSocket.addEventListener('close',()=>{liveStatus.textContent='● KÖPRÜ KAPALI';});
-  liveSocket.addEventListener('error',()=>{liveStatus.textContent='● BAĞLANTI HATASI';});
-  liveSocket.addEventListener('message',(event)=>{
-    let payload; try{payload=JSON.parse(event.data)}catch{return;}
-    if(payload.type==='status'){
-      liveStatus.textContent=payload.status==='connected'?'● TIKTOK LIVE BAĞLI':('● '+String(payload.status||'DURUM').toUpperCase());
-    }
-    if(payload.type==='gift'){
-      if(payload.kind==='unknown'){gift('unknown',payload.username);}
-      else {gift(payload.kind,payload.username);}
-    }
-  });
+ const liveSocket=new WebSocket('ws://127.0.0.1:21213/');
+ liveSocket.addEventListener('open',()=>{liveStatus.textContent='● TIKFINITY BAĞLI';});
+ liveSocket.addEventListener('close',()=>{liveStatus.textContent='● TIKFINITY KAPALI';});
+ liveSocket.addEventListener('error',()=>{liveStatus.textContent='● TIKFINITY BAĞLANTI HATASI';});
+ liveSocket.addEventListener('message',(event)=>{
+  let packet; try{packet=JSON.parse(event.data)}catch{return;}
+  if(packet.event==='gift'){
+   const d=packet.data||{};
+   const kind=normalizeGift(d.giftName||d.gift_name||d.name||d.gift?.name);
+   const username=d.nickname||d.uniqueId||d.unique_id||d.username||d.user?.nickname||'TikTok izleyicisi';
+   const count=Math.max(1,Number(d.repeatCount||d.repeat_count||1));
+   gift(kind,username,count);
+  }
+ });
 } catch (error) { liveStatus.textContent='● DEMO MODU'; }
 document.querySelectorAll('.gift').forEach(b=>b.addEventListener('click',()=>gift(b.dataset.kind,'Test_izleyici',1)));document.querySelector('#reset').addEventListener('click',()=>{spark=18;document.querySelector('#sparkText').textContent='%18';document.querySelector('#sparkMeter').style.width='18%';document.querySelector('#colorText').textContent='Galaksi moru + nane';slimeMat.color.set(0x9e72e8);slime.scale.set(1.48,.31,.78);foam=1;waterLevel=0;teaTint=0;document.querySelector('#consistencyText').textContent='Dengeli';tableTop.rotation.z=0;trayGroup.rotation.z=0;kettle.visible=false;beads.forEach(b=>b.visible=false);caption.textContent='Slime sıfırlandı. Yeni hediyeyi bekliyoruz!';document.querySelector('#feed').innerHTML='<div class="event">Slime sıfırlandı. Sistem hazır.</div>'});
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();slime.position.y=1.43+Math.sin(t*1.8)*.018;beat=Math.max(0,beat-.018);slime.scale.y=.31+Math.sin(t*2.4)*.012-beat*.07;slime.scale.x=1.48+beat*.10;slime.scale.z=.78+beat*.06;const pos=blobGeo.attributes.position;for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],z=base[i*3+2];const wave=Math.sin(x*4+t*2)*Math.cos(z*3+t*1.5)*.025;pos.setY(i,y+wave)}pos.needsUpdate=true;blobGeo.computeVertexNormals();host.position.y=Math.sin(t*1.5)*.025;host.rotation.z=Math.sin(t*.9)*.012;dust.forEach((p,i)=>{p.position.y+=.002+(i%3)*.0004;if(p.position.y>6)p.position.y=0});renderer.render(scene,camera)}
